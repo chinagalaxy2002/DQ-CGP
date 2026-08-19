@@ -1,0 +1,11 @@
+model_name: moment_detr
+
+# T-CGP is opt-in so released Moment-DETR checkpoints keep their legacy path.
+use_tcgp: true
+use_query_attention_mask: true
+
+tcgp_num_basis: 16
+tcgp_prompt_length: 1
+tcgp_router_hidden_dim: 256
+tcgp_temperature: 1.0
+tcgp_alpha_init: 0.1

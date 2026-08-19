@@ -1,0 +1,15 @@
+dset_name: soccer_gmr
+clip_length: 2
+train_path: data/label/Standard/train.jsonl
+eval_path: data/label/Standard/val.jsonl
+
+lr: 0.00005
+bsz: 8
+eval_bsz: 4
+n_epoch: 400
+max_es_cnt: 50
+lw_saliency: 1
+use_exist_head: true
+exist_pool: max
+exist_loss_coef: 1.0
+exist_gate_thd: 0.3

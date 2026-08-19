@@ -1,0 +1,6 @@
+model_name: moment_detr
+
+# Fair scratch baseline for T-CGP: use the same corrected CLIP token mask while
+# keeping the architecture identical to Moment-DETR-GMR.
+use_tcgp: false
+use_query_attention_mask: true

@@ -1,0 +1,18 @@
+model_name: moment_detr
+
+# DQ-CGP adapts each existing DETR candidate independently while preserving
+# the paper-original encoder input path.
+use_tcgp: false
+use_vmr_cgp: false
+use_query_cgp: true
+use_query_attention_mask: false
+query_cgp_use_semantic_mask: true
+
+query_cgp_num_basis: 16
+query_cgp_prompt_length: 6
+query_cgp_router_hidden_dim: 256
+query_cgp_frf_hidden_dim: 512
+query_cgp_temperature: 1.0
+query_cgp_beta: 0.05
+query_cgp_binding_loss_coef: 0.2
+query_cgp_route_loss_coef: 0.01

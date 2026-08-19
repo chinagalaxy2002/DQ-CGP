@@ -1,0 +1,17 @@
+model_name: moment_detr
+
+# The paper-original input path remains unchanged so the only architectural
+# difference from the local MomentDETR baseline is VMR-CGP.
+use_tcgp: false
+use_vmr_cgp: true
+use_query_attention_mask: false
+
+vmr_cgp_num_basis: 16
+vmr_cgp_prompt_length: 4
+vmr_cgp_router_hidden_dim: 256
+vmr_cgp_temperature: 1.0
+vmr_cgp_alpha_init: 0.01
+vmr_cgp_alpha_trainable: true
+vmr_cgp_gate_floor: 0.0
+vmr_cgp_temporal_loss_coef: 0.2
+vmr_cgp_route_loss_coef: 0.01

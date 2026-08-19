@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+.vscode/
+Soccergmr/
+features/
+outputs/
+*.ckpt
+!checkpoints/dq_cgp_v3_best_epoch86.ckpt

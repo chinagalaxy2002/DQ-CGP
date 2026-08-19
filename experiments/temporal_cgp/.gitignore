@@ -1,0 +1,3 @@
+# Keep local smoke checkpoints available without accidentally committing
+# ~70 MB binary training states. Metrics, logs, and reports remain trackable.
+runs/**/*.ckpt

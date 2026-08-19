@@ -1,0 +1,17 @@
+model_name: moment_detr
+
+# Mechanism-controlled VMR-CGP.  All Moment-DETR settings and auxiliary-loss
+# weights match v1; only the feature residual is prevented from collapsing.
+use_tcgp: false
+use_vmr_cgp: true
+use_query_attention_mask: false
+
+vmr_cgp_num_basis: 16
+vmr_cgp_prompt_length: 4
+vmr_cgp_router_hidden_dim: 256
+vmr_cgp_temperature: 1.0
+vmr_cgp_alpha_init: 0.1
+vmr_cgp_alpha_trainable: false
+vmr_cgp_gate_floor: 0.1
+vmr_cgp_temporal_loss_coef: 0.2
+vmr_cgp_route_loss_coef: 0.01

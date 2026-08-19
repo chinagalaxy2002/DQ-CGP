@@ -1,0 +1,91 @@
+seed: 2023
+device: cuda
+num_workers: 4
+
+lr: 0.00005
+lr_drop: 400
+wd: 0.0001
+n_epoch: 400
+max_es_cnt: 50
+bsz: 8
+eval_bsz: 4
+grad_clip: 0.1
+max_q_l: 32
+max_v_l: 75
+max_a_l: 75
+max_windows: 8
+clip_length: 2
+eval_epoch_interval: 1
+
+position_embedding: sine
+enc_layers: 2
+dec_layers: 2
+dim_feedforward: 1024
+hidden_dim: 256
+input_dropout: 0.5
+dropout: 0.1
+nheads: 8
+num_queries: 10
+
+n_input_proj: 2
+saliency_margin: 0.2
+span_loss_type: l1
+set_cost_span: 10
+set_cost_giou: 1
+set_cost_class: 4
+span_loss_coef: 10
+giou_loss_coef: 1
+label_loss_coef: 4
+eos_coef: 0.1
+lw_saliency: 1
+
+use_exist_head: false
+exist_pool: max
+exist_loss_coef: 1.0
+exist_gate_thd: 0.3
+
+# Disabled compatibility defaults.  The moment_detr_tcgp model config enables
+# both the adapter and the corrected CLIP attention-mask path.
+use_tcgp: false
+use_query_attention_mask: false
+tcgp_num_basis: 16
+tcgp_prompt_length: 1
+tcgp_router_hidden_dim: 256
+tcgp_temperature: 1.0
+tcgp_alpha_init: 0.1
+
+# Shape-preserving text-token enhancement for the VMR-CGP experiment.
+use_vmr_cgp: false
+vmr_cgp_num_basis: 16
+vmr_cgp_prompt_length: 4
+vmr_cgp_router_hidden_dim: 256
+vmr_cgp_temperature: 1.0
+vmr_cgp_alpha_init: 0.01
+vmr_cgp_alpha_trainable: true
+vmr_cgp_gate_floor: 0.0
+vmr_cgp_temporal_loss_coef: 0.2
+vmr_cgp_route_loss_coef: 0.01
+
+# Candidate-specific DQ-CGP inserted between Moment-DETR decoder layers.
+# It is opt-in so baseline and VMR-CGP v1/v2 checkpoints retain their exact
+# architecture and input semantics.
+use_query_cgp: false
+query_cgp_num_basis: 16
+query_cgp_prompt_length: 6
+query_cgp_router_hidden_dim: 256
+query_cgp_frf_hidden_dim: 512
+query_cgp_temperature: 1.0
+query_cgp_beta: 0.05
+query_cgp_binding_loss_coef: 0.2
+query_cgp_route_loss_coef: 0.01
+query_cgp_use_semantic_mask: false
+
+ckpt_filename: best.ckpt
+train_log_filename: train.log
+eval_log_filename: val.log
+eval_split_name: val
+aux_loss: true
+
+model_ema: false
+ema_decay: 0.9
+results_dir: results

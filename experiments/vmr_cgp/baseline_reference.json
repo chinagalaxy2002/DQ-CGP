@@ -1,0 +1,11 @@
+{
+  "method": "locally trained paper-original MomentDETR-GMR",
+  "model_config": "moment_detr",
+  "checkpoint": "experiments/temporal_cgp/runs/original_moment_detr_seed2023/best.ckpt",
+  "checkpoint_epoch_zero_based": 57,
+  "seed": 2023,
+  "use_query_attention_mask": false,
+  "validation_primary_metric": "MR-full-mAP",
+  "validation_primary_value": 8.59,
+  "checkpoint_sha256": "d1dde638965b7f086122bcf183752bc5987db0acf8aae46b9f5816e3dc71bf1d"
+}
