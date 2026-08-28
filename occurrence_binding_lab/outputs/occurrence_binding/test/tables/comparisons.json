@@ -1,0 +1,273 @@
+{
+  "bootstrap": 10000,
+  "comparisons": [
+    {
+      "first": "baseline",
+      "second": "dq_active",
+      "interpretation": "second minus first; sampling unit is qid; only multi-occurrence records are included",
+      "metrics": {
+        "coverage@5_05": {
+          "n_qids": 160,
+          "mean_difference": 0.25604166666666667,
+          "ci95": [
+            0.1912473958333333,
+            0.3212526041666666
+          ]
+        },
+        "coverage@3_05": {
+          "n_qids": 160,
+          "mean_difference": 0.231875,
+          "ci95": [
+            0.1739583333333333,
+            0.29187760416666664
+          ]
+        },
+        "duplicate_rate@5_05": {
+          "n_qids": 42,
+          "mean_difference": -0.0039682539682539646,
+          "ci95": [
+            -0.10317460317460317,
+            0.09126984126984128
+          ]
+        },
+        "aec_d1": {
+          "n_qids": 160,
+          "mean_difference": 0.29520833333333335,
+          "ci95": [
+            0.2482265625,
+            0.3421901041666666
+          ]
+        },
+        "aec_d2": {
+          "n_qids": 160,
+          "mean_difference": 0.3828125,
+          "ci95": [
+            0.335625,
+            0.4307291666666666
+          ]
+        },
+        "binding_margin_d1": {
+          "n_qids": 160,
+          "mean_difference": 0.2451178110562847,
+          "ci95": [
+            0.21584547968256032,
+            0.2742934400337854
+          ]
+        },
+        "binding_margin_d2": {
+          "n_qids": 160,
+          "mean_difference": 0.23530419644942785,
+          "ci95": [
+            0.20700251571103,
+            0.263985695127202
+          ]
+        },
+        "ecr_d1": {
+          "n_qids": 160,
+          "mean_difference": -0.4604166666666667,
+          "ci95": [
+            -0.5414583333333334,
+            -0.3791666666666667
+          ]
+        },
+        "ecr_d2": {
+          "n_qids": 160,
+          "mean_difference": -0.53625,
+          "ci95": [
+            -0.6164583333333333,
+            -0.45354166666666673
+          ]
+        },
+        "residual_update_l2_mean": {
+          "n_qids": 0,
+          "mean_difference": null,
+          "ci95": [
+            null,
+            null
+          ]
+        }
+      }
+    },
+    {
+      "first": "dq_beta_zero",
+      "second": "dq_active",
+      "interpretation": "second minus first; sampling unit is qid; only multi-occurrence records are included",
+      "metrics": {
+        "coverage@5_05": {
+          "n_qids": 160,
+          "mean_difference": 0.002083333333333333,
+          "ci95": [
+            -0.013020833333333332,
+            0.01666666666666667
+          ]
+        },
+        "coverage@3_05": {
+          "n_qids": 160,
+          "mean_difference": 0.013020833333333334,
+          "ci95": [
+            -0.003125,
+            0.03020833333333333
+          ]
+        },
+        "duplicate_rate@5_05": {
+          "n_qids": 114,
+          "mean_difference": 0.014619883040935672,
+          "ci95": [
+            -0.017543859649122806,
+            0.049707602339181284
+          ]
+        },
+        "aec_d1": {
+          "n_qids": 160,
+          "mean_difference": 0.003125,
+          "ci95": [
+            0.0,
+            0.009375
+          ]
+        },
+        "aec_d2": {
+          "n_qids": 160,
+          "mean_difference": 0.0015625,
+          "ci95": [
+            0.0,
+            0.0046875
+          ]
+        },
+        "binding_margin_d1": {
+          "n_qids": 160,
+          "mean_difference": 0.0011189787383230835,
+          "ci95": [
+            0.0,
+            0.002825062108399211
+          ]
+        },
+        "binding_margin_d2": {
+          "n_qids": 160,
+          "mean_difference": 0.00277437293810496,
+          "ci95": [
+            -8.834557356718639e-05,
+            0.007040685142140902
+          ]
+        },
+        "ecr_d1": {
+          "n_qids": 160,
+          "mean_difference": -0.00625,
+          "ci95": [
+            -0.01875,
+            0.0
+          ]
+        },
+        "ecr_d2": {
+          "n_qids": 160,
+          "mean_difference": -0.0010416666666666667,
+          "ci95": [
+            -0.003125,
+            0.0
+          ]
+        },
+        "residual_update_l2_mean": {
+          "n_qids": 0,
+          "mean_difference": null,
+          "ci95": [
+            null,
+            null
+          ]
+        }
+      }
+    },
+    {
+      "first": "dq_context_roll",
+      "second": "dq_active",
+      "interpretation": "second minus first; sampling unit is qid; only multi-occurrence records are included",
+      "metrics": {
+        "coverage@5_05": {
+          "n_qids": 160,
+          "mean_difference": 0.003125,
+          "ci95": [
+            -0.0109375,
+            0.0171875
+          ]
+        },
+        "coverage@3_05": {
+          "n_qids": 160,
+          "mean_difference": 0.0109375,
+          "ci95": [
+            -0.0015625,
+            0.0265625
+          ]
+        },
+        "duplicate_rate@5_05": {
+          "n_qids": 113,
+          "mean_difference": -0.008849557522123894,
+          "ci95": [
+            -0.030973451327433628,
+            0.008849557522123894
+          ]
+        },
+        "aec_d1": {
+          "n_qids": 160,
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "aec_d2": {
+          "n_qids": 160,
+          "mean_difference": -0.0015625,
+          "ci95": [
+            -0.009375,
+            0.0046875
+          ]
+        },
+        "binding_margin_d1": {
+          "n_qids": 160,
+          "mean_difference": 0.00017535010719442354,
+          "ci95": [
+            -0.004525259771243999,
+            0.003983578456504272
+          ]
+        },
+        "binding_margin_d2": {
+          "n_qids": 160,
+          "mean_difference": 0.0018954571201735882,
+          "ci95": [
+            -0.0009864318128599491,
+            0.0047044453519529085
+          ]
+        },
+        "ecr_d1": {
+          "n_qids": 160,
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "ecr_d2": {
+          "n_qids": 160,
+          "mean_difference": 0.005208333333333334,
+          "ci95": [
+            -0.003125,
+            0.01875
+          ]
+        },
+        "residual_update_l2_mean": {
+          "n_qids": 160,
+          "mean_difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "residual_roll_check": {
+        "n_qids": 1036,
+        "max_abs_error": 0.0,
+        "mean_abs_error": 0.0,
+        "mean_vector_abs_error": 0.0,
+        "expected": "rolled residual_update_l2[j] equals active residual_update_l2[j-1]"
+      }
+    }
+  ]
+}
