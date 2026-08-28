@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+results/**/best.ckpt
+results/**/epoch_*.ckpt
+results/**/checkpoint*.ckpt

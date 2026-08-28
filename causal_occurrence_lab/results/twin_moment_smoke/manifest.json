@@ -1,0 +1,44 @@
+[
+  {
+    "qid": 10000000,
+    "source_qid": 2711,
+    "difficulty": "exact",
+    "original_window": [
+      133.0,
+      141.0
+    ],
+    "twin_window": [
+      0.0,
+      10.0
+    ],
+    "duration": 150
+  },
+  {
+    "qid": 10000001,
+    "source_qid": 2711,
+    "difficulty": "moderate",
+    "original_window": [
+      133.0,
+      141.0
+    ],
+    "twin_window": [
+      0.0,
+      10.0
+    ],
+    "duration": 150
+  },
+  {
+    "qid": 10000002,
+    "source_qid": 2711,
+    "difficulty": "mixed",
+    "original_window": [
+      133.0,
+      141.0
+    ],
+    "twin_window": [
+      0.0,
+      10.0
+    ],
+    "duration": 150
+  }
+]

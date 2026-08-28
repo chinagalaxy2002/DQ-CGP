@@ -1,0 +1,12 @@
+{
+  "variant": "native_bind",
+  "seed": 2023,
+  "binding_loss_coef": 0.2,
+  "route_loss_coef": 0.0,
+  "binding_target": "matched",
+  "inject_residual": false,
+  "lr": 5e-05,
+  "batch_size": 2,
+  "epochs": 1,
+  "checkpoint_selection": "val MR-full-mAP"
+}
