@@ -152,7 +152,7 @@ def effect_diagnostics(active: Sequence[Mapping[str, Any]], identity: Sequence[M
         "n_qids": len(jaccards),
         "max_abs_classification_delta": max(score_deltas) if score_deltas else None,
         "mean_abs_classification_delta": float(np.mean(score_deltas)) if score_deltas else None,
-        "max_abs_span_delta_normalized_seconds": max(span_deltas) if span_deltas else None,
+        "max_abs_span_delta_seconds": max(span_deltas) if span_deltas else None,
         "mean_abs_span_delta_seconds": float(np.mean(span_deltas)) if span_deltas else None,
         "mean_top5_query_jaccard": float(np.mean(jaccards)) if jaccards else None,
         "relative_update_mean": float(np.mean([

@@ -12,7 +12,7 @@ bash causal_occurrence_lab/run_phase1.sh
 
 它会运行 `baseline`、`dq_active`、`dq_beta_zero` 和 `dq_stripped`，并输出：
 
-- D1 auxiliary prediction 和 D2 prediction 的 mAP、mR、mR+、mIoU 等 GMR 指标；
+- D1 auxiliary prediction 和 D2 prediction 的 raw-span diagnostic mAP、mR、mR+、mIoU 等 GMR 指标（不应用正式 pipeline 的 `PostProcessorDETR`）；
 - D1 own-match、D1 final-match、D2 的 raw/length-normalized AEC、binding margin、ECR；
 - 修正后的 one-to-one duplicate attribution rate；
 - all multi-occurrence、2 occurrences、>=3 occurrences、clean non-overlapping subset；
@@ -56,7 +56,22 @@ outputs/causal_ablation/
 
 另外已经实现但默认不首轮运行的控制是：`wrong_bind`、`no_route`、`architecture_only` 和 `native_bind`。其中 `native_bind` 使用 baseline 原生 D1 decoder cross-attention，并施加同样的 matched binding loss，不引入 DQ head。
 
+正式因果训练前先运行完整复现实验：
+
+```bash
+bash causal_occurrence_lab/run_full_repro.sh
+```
+
+它使用 `full_repro` variant，默认 seed 2023，并写入
+`outputs/causal_ablation/full_repro_seed2023/`；这是从头训练的 causal-harness
+复现，不会从 release Full checkpoint resume。
+
 训练保持 seed 2023、lr `5e-5`、batch size 8、400 epochs、patience 50，并始终用 validation `MR-full-mAP` 选择 best checkpoint。`--max-train-batches` 仅用于 smoke test，正式实验不要设置。
+
+`query_cgp` route loss 严格复用 production 定义：先把一个 batch 中全部
+matched routes `torch.cat`，再计算
+`H_conditional - H_marginal`。实现和 production `SetCriterion.loss_query_cgp`
+的 binding/route 数值一致性由单元测试覆盖。
 
 ## Training trajectory
 

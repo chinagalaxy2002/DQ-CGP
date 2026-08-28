@@ -58,6 +58,9 @@ logging.basicConfig(
 VARIANTS: dict[str, dict[str, Any]] = {
     "baseline": {"dq": False, "bind": 0.0, "route": 0.0, "inject": False, "target": "matched"},
     "full": {"dq": True, "bind": 0.2, "route": 0.01, "inject": True, "target": "matched"},
+    # Independent from the released checkpoint: this alias makes the exact
+    # seed-2023 causal-harness reproduction explicit in run directories.
+    "full_repro": {"dq": True, "bind": 0.2, "route": 0.01, "inject": True, "target": "matched"},
     "no_bind": {"dq": True, "bind": 0.0, "route": 0.01, "inject": True, "target": "matched"},
     "supervision_only": {"dq": True, "bind": 0.2, "route": 0.0, "inject": False, "target": "matched"},
     "union_bind": {"dq": True, "bind": 0.2, "route": 0.01, "inject": True, "target": "union"},

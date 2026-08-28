@@ -193,6 +193,40 @@ def _binding_loss(
     return attention.sum() * 0.0
 
 
+def _matched_route_loss(
+    routes: Tensor,
+    indices: list[tuple[Tensor, Tensor]],
+) -> Tensor:
+    """Match the production ``SetCriterion.loss_query_cgp`` route objective.
+
+    The marginal distribution must be computed once over all matched queries
+    in the batch.  In particular, the objective is
+
+    ``H(route | matched query) - H(mean(route over matched queries))``.
+
+    Keeping this as a small standalone helper makes the causal patch auditable
+    and lets the tests compare it directly with the unmodified criterion.
+    """
+
+    matched_routes = []
+    for batch_index, (src_indices, _) in enumerate(indices):
+        if src_indices.numel():
+            matched_routes.append(routes[batch_index, src_indices.to(routes.device)])
+    if not matched_routes:
+        return routes.sum() * 0.0
+
+    selected = torch.cat(matched_routes, dim=0)
+    eps = torch.finfo(selected.dtype).eps
+    conditional_entropy = -(
+        selected * selected.clamp_min(eps).log()
+    ).sum(dim=-1).mean()
+    marginal = selected.mean(dim=0)
+    marginal_entropy = -(
+        marginal * marginal.clamp_min(eps).log()
+    ).sum()
+    return conditional_entropy - marginal_entropy
+
+
 def install_criterion_controls(
     criterion: Any,
     *,
@@ -230,17 +264,7 @@ def install_criterion_controls(
             if routes is None:
                 route = bind * 0.0
             else:
-                route_terms = []
-                eps = torch.finfo(routes.dtype).eps
-                for batch_index, (src_indices, _) in enumerate(indices):
-                    if src_indices.numel():
-                        selected = routes[batch_index, src_indices.to(routes.device)]
-                        marginal = selected.mean(dim=0)
-                        route_terms.append(
-                            -(selected * selected.clamp_min(eps).log()).sum(dim=-1).mean()
-                            - (marginal * marginal.clamp_min(eps).log()).sum()
-                        )
-                route = torch.stack(route_terms).mean() if route_terms else routes.sum() * 0.0
+                route = _matched_route_loss(routes, indices)
             return {"loss_query_cgp_bind": bind, "loss_query_cgp_route": route}
         if loss == "native_bind":
             key = "native_d1_temporal_attention"

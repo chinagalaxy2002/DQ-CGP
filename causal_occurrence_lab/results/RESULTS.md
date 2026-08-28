@@ -1,14 +1,15 @@
 # Causal occurrence-binding results
 
-This directory contains the artifacts produced by the isolated
+This directory contains artifacts produced by the isolated
 `causal_occurrence_lab` harness. Existing source directories in the repository
 were not modified.
 
 ## Phase 1: existing checkpoints
 
 The `phase1_existing_checkpoints/` artifacts evaluate the existing baseline and
-DQ-CGP checkpoints before any new causal-ablation training. The multi-occurrence
-subset contains 160 qids. The main measured results are:
+DQ-CGP checkpoints before any new causal-ablation training. The
+multi-occurrence subset contains 160 qids. The main measured results are raw-
+span diagnostic metrics (the formal `PostProcessorDETR` is not applied):
 
 | Run | D1 mAP | D2 mAP | Coverage@5@0.5 | AEC-D1 final | AEC-D2 | ECR-D1 | ECR-D2 |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -17,16 +18,15 @@ subset contains 160 qids. The main measured results are:
 | dq_beta_zero | 14.99 | 15.47 | 0.4349 | 0.7818 | 0.8072 | 0.3210 | 0.3352 |
 | dq_stripped | 14.99 | 15.47 | 0.4349 | 0.7818 | 0.8072 | 0.3210 | 0.3352 |
 
-Values are copied from the generated JSON summaries; the complete per-qid
-records and D1/D2 submissions are kept under each run directory. The corrected
-one-prediction-to-one-GT duplicate attribution is used, so recorded DAR values
-remain in `[0, 1]`.
+Complete per-qid records and D1/D2 submissions are kept under each run
+directory. Corrected one-prediction-to-one-GT duplicate attribution is used,
+so recorded DAR values remain in `[0, 1]`.
 
 The active-vs-beta-zero diagnostics are in
 `phase1_existing_checkpoints/tables/causal_comparisons.md`:
 
 - mean classification probability difference: `0.00703`;
-- mean span difference: `0.299` normalized seconds;
+- mean span difference: `0.299` seconds;
 - mean Top-5 query ranking Jaccard: `0.96879`;
 - mean relative residual update: `0.05271`.
 
@@ -54,7 +54,7 @@ smoke run.
 
 ## Reproduction
 
-See `causal_occurrence_lab/README.md` for the phase-1 analysis, first-round
+See `causal_occurrence_lab/README.md` for phase-1 analysis, first-round
 training, multi-seed, trajectory, similarity, and Twin-Moment commands. The
 formal model-selection rule remains validation `MR-full-mAP`; checkpoints are
 intentionally excluded from this commit.

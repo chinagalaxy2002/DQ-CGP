@@ -502,7 +502,7 @@
     "n_qids": 1036,
     "max_abs_classification_delta": 0.10061413049697876,
     "mean_abs_classification_delta": 0.0070337313095053845,
-    "max_abs_span_delta_normalized_seconds": 3.4550743103027344,
+    "max_abs_span_delta_seconds": 3.4550743103027344,
     "mean_abs_span_delta_seconds": 0.29891833748999247,
     "mean_top5_query_jaccard": 0.9687902187902188,
     "relative_update_mean": 0.052711296301248795
@@ -511,7 +511,7 @@
     "n_qids": 1036,
     "max_abs_classification_delta": 0.10061413049697876,
     "mean_abs_classification_delta": 0.0070337313095053845,
-    "max_abs_span_delta_normalized_seconds": 3.4550743103027344,
+    "max_abs_span_delta_seconds": 3.4550743103027344,
     "mean_abs_span_delta_seconds": 0.29891833748999247,
     "mean_top5_query_jaccard": 0.9687902187902188,
     "relative_update_mean": 0.052711296301248795

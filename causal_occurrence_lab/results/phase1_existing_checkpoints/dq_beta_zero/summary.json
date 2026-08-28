@@ -5,6 +5,7 @@
   "num_records": 1036,
   "num_positive_records": 544,
   "num_multi_occurrence_records": 160,
+  "prediction_metric_protocol": "raw pred_spans converted to seconds; PostProcessorDETR clip_ts and round_multiple are not applied",
   "prediction_metrics": {
     "d1": {
       "GMR-CLS": {

@@ -60,6 +60,13 @@ def _prediction_metrics(
     layer: str,
     map_workers: int,
 ) -> dict[str, Any]:
+    """Return diagnostic GMR metrics from raw predicted spans.
+
+    This intentionally does not apply the release evaluation pipeline's
+    ``PostProcessorDETR`` (``clip_ts`` and ``round_multiple``).  The result is
+    therefore labelled as raw-span diagnostic metrics in the summary rather
+    than as the formal benchmark number.
+    """
     submission = submission_for_layer(records, layer)
     result = evaluate_gmr(
         submission,
@@ -353,6 +360,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "d1": _prediction_metrics(records, dataset.data, "d1", args.map_workers),
             "d2": _prediction_metrics(records, dataset.data, "d2", args.map_workers),
         },
+        "prediction_metric_protocol": (
+            "raw pred_spans converted to seconds; PostProcessorDETR clip_ts and "
+            "round_multiple are not applied"
+        ),
         "buckets": {
             name: {"num_records": len(items), "metrics": _metric_summary(items)}
             for name, items in buckets.items()
