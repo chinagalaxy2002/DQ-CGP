@@ -79,6 +79,13 @@ Standard test 的完整 GMR 评测：
 - [baseline test metrics](results/baseline_test_metrics.json)
 - [best validation metrics](results/val_best_metrics.json)
 
+### 组件归因实验
+
+仓库同时提供 seed 2023 下的9组受控实验：完整的
+`Binding × Route × Injection` 八组因子消融，以及一组不增加可训练参数的原生 decoder
+cross-attention binding 验证。代码、训练/验证日志、官方测试结果和结论见
+[component attribution report](results/component_attribution_seed2023/RESULTS.md)。
+
 ## 3. 环境
 
 本次结果使用：

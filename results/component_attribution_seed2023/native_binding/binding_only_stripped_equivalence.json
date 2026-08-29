@@ -1,0 +1,12 @@
+{
+  "checkpoint": "<repo>/outputs/dq_cgp_working_part_seed2023/binding_only/best.ckpt",
+  "checked_samples": 255,
+  "max_abs_diff": {
+    "pred_logits": 0.0,
+    "pred_spans": 0.0,
+    "pred_exist_logits": 0.0,
+    "saliency_scores": 0.0
+  },
+  "exact": true,
+  "stripped_query_cgp_keys": 25
+}

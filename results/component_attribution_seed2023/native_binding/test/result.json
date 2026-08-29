@@ -1,0 +1,29 @@
+{
+  "variant": "native_binding",
+  "inject_residual": true,
+  "checkpoint": "<repo>/outputs/native_binding_validation_seed2023/best.ckpt",
+  "checkpoint_epoch": 81,
+  "brief": {
+    "AUROC": 76.69,
+    "Rej-F1@0.4": 52.25,
+    "Acc@0.4": 64.19,
+    "Rej-F1@0.6": 75.65,
+    "Acc@0.6": 70.85,
+    "G-mIoU@1": 30.07,
+    "G-mIoU@3": 24.66,
+    "G-mIoU@5": 22.72,
+    "mAP": 14.46,
+    "mR@1": 9.9,
+    "mR@3": 16.13,
+    "mR@5": 19.77,
+    "mR+@1": 0.0,
+    "mR+@3": 1.64,
+    "mR+@5": 4.43,
+    "mIoU@1": 25.42,
+    "mIoU@3": 24.37,
+    "mIoU@5": 24.19,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 6.8,
+    "mIoU+@5": 6.21
+  }
+}

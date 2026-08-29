@@ -1,0 +1,29 @@
+{
+  "variant": "injection_only",
+  "inject_residual": true,
+  "checkpoint": "<repo>/outputs/dq_cgp_working_part_seed2023/injection_only/best.ckpt",
+  "checkpoint_epoch": 57,
+  "brief": {
+    "AUROC": 70.42,
+    "Rej-F1@0.4": 4.69,
+    "Acc@0.4": 52.9,
+    "Rej-F1@0.6": 75.0,
+    "Acc@0.6": 68.34,
+    "G-mIoU@1": 6.42,
+    "G-mIoU@3": 3.39,
+    "G-mIoU@5": 2.54,
+    "mAP": 6.71,
+    "mR@1": 2.9,
+    "mR@3": 7.38,
+    "mR@5": 10.94,
+    "mR+@1": 0.0,
+    "mR+@3": 0.19,
+    "mR+@5": 0.69,
+    "mIoU@1": 11.53,
+    "mIoU@3": 10.71,
+    "mIoU@5": 10.64,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 1.03,
+    "mIoU+@5": 0.93
+  }
+}

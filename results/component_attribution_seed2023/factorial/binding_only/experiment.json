@@ -1,0 +1,8 @@
+{
+  "variant": "binding_only",
+  "seed": 2023,
+  "dq": true,
+  "bind": 0.2,
+  "route": 0.0,
+  "inject": false
+}

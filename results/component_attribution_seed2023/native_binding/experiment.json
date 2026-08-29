@@ -1,0 +1,7 @@
+{
+  "variant": "native_binding",
+  "seed": 2023,
+  "model": "plain_moment_detr",
+  "native_binding_coef": 0.2,
+  "extra_trainable_parameters": 0
+}

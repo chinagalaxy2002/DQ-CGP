@@ -1,0 +1,29 @@
+{
+  "variant": "baseline",
+  "inject_residual": false,
+  "checkpoint": "<repo>/outputs/dq_cgp_working_part_seed2023/baseline/best.ckpt",
+  "checkpoint_epoch": 11,
+  "brief": {
+    "AUROC": 71.87,
+    "Rej-F1@0.4": 0.0,
+    "Acc@0.4": 52.51,
+    "Rej-F1@0.6": 75.0,
+    "Acc@0.6": 68.34,
+    "G-mIoU@1": 5.67,
+    "G-mIoU@3": 2.44,
+    "G-mIoU@5": 1.49,
+    "mAP": 6.14,
+    "mR@1": 4.16,
+    "mR@3": 6.48,
+    "mR@5": 7.89,
+    "mR+@1": 0.0,
+    "mR+@3": 0.56,
+    "mR+@5": 0.69,
+    "mIoU@1": 12.3,
+    "mIoU@3": 11.65,
+    "mIoU@5": 11.61,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 1.52,
+    "mIoU+@5": 1.54
+  }
+}

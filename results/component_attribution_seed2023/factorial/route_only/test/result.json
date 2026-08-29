@@ -1,0 +1,29 @@
+{
+  "variant": "route_only",
+  "inject_residual": false,
+  "checkpoint": "<repo>/outputs/dq_cgp_working_part_seed2023/route_only/best.ckpt",
+  "checkpoint_epoch": 9,
+  "brief": {
+    "AUROC": 68.88,
+    "Rej-F1@0.4": 0.0,
+    "Acc@0.4": 52.51,
+    "Rej-F1@0.6": 75.0,
+    "Acc@0.6": 68.34,
+    "G-mIoU@1": 6.35,
+    "G-mIoU@3": 2.74,
+    "G-mIoU@5": 1.68,
+    "mAP": 7.84,
+    "mR@1": 4.3,
+    "mR@3": 9.71,
+    "mR@5": 12.6,
+    "mR+@1": 0.0,
+    "mR+@3": 0.09,
+    "mR+@5": 1.25,
+    "mIoU@1": 14.09,
+    "mIoU@3": 12.83,
+    "mIoU@5": 12.79,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 0.71,
+    "mIoU+@5": 0.78
+  }
+}
