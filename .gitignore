@@ -3,8 +3,11 @@ __pycache__/
 .pytest_cache/
 .idea/
 .vscode/
+Soccergmr
 Soccergmr/
 features/
 outputs/
 *.ckpt
 !checkpoints/dq_cgp_v3_best_epoch86.ckpt
+!checkpoints/ls_dq_cgp_best_epoch139.ckpt
+.agents/

@@ -1,0 +1,30 @@
+{
+  "variant": "ls_dq_cgp",
+  "mode": "static_bypass",
+  "split": "test",
+  "checkpoint": "/home/guoxiangyu/VLMbasedIter_momentretrival/DQ-CGP-github-publish/outputs/ls_dq_cgp_seed2023/best.ckpt",
+  "checkpoint_epoch": 139,
+  "brief": {
+    "AUROC": 36.64,
+    "Rej-F1@0.4": 54.53,
+    "Acc@0.4": 43.34,
+    "Rej-F1@0.6": 63.04,
+    "Acc@0.6": 46.81,
+    "G-mIoU@1": 34.57,
+    "G-mIoU@3": 34.56,
+    "G-mIoU@5": 34.39,
+    "mAP": 11.68,
+    "mR@1": 4.95,
+    "mR@3": 12.15,
+    "mR@5": 18.64,
+    "mR+@1": 0.0,
+    "mR+@3": 1.84,
+    "mR+@5": 6.77,
+    "mIoU@1": 12.29,
+    "mIoU@3": 11.31,
+    "mIoU@5": 11.26,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 2.29,
+    "mIoU+@5": 2.39
+  }
+}

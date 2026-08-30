@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PYTHON="/home/guoxiangyu/miniconda3/envs/GMR/bin/python"
+GPU=${1:-1}
+OUTPUT="${ROOT}/outputs/ls_dq_cgp_seed2023"
+
+echo "=========================================================="
+echo "Starting LS-DQ-CGP Experiment on GPU ${GPU}"
+echo "Output Directory: ${OUTPUT}"
+echo "=========================================================="
+
+# 1. Run Training
+"${PYTHON}" -u "${ROOT}/ls_dq_cgp_lab/train_ls_dq_cgp.py" \
+  --output "${OUTPUT}" \
+  --gpu "${GPU}" \
+  --seed 2023 \
+  --epochs 400 \
+  --lr 5e-5 \
+  --native_bind_coef 0.2 \
+  --overwrite
+
+echo "=========================================================="
+echo "Training Complete! Running Active Evaluation on Test Split"
+echo "=========================================================="
+
+# 2. Evaluate Active Mode on Test Split
+"${PYTHON}" -u "${ROOT}/ls_dq_cgp_lab/evaluate_ls_dq_cgp.py" \
+  --checkpoint "${OUTPUT}/best.ckpt" \
+  --output "${OUTPUT}/test_active" \
+  --split test \
+  --gpu "${GPU}"
+
+echo "=========================================================="
+echo "Running Counterfactual Static Bypass Evaluation on Test Split"
+echo "=========================================================="
+
+# 3. Evaluate Static Bypass Mode on Test Split
+"${PYTHON}" -u "${ROOT}/ls_dq_cgp_lab/evaluate_ls_dq_cgp.py" \
+  --checkpoint "${OUTPUT}/best.ckpt" \
+  --output "${OUTPUT}/test_static_bypass" \
+  --split test \
+  --static_bypass \
+  --gpu "${GPU}"
+
+echo "=========================================================="
+echo "Experiment Completed Successfully!"
+echo "Results:"
+echo "  Active:        ${OUTPUT}/test_active/result.json"
+echo "  Static Bypass: ${OUTPUT}/test_static_bypass/result.json"
+echo "=========================================================="
