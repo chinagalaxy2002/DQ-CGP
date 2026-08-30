@@ -151,9 +151,11 @@ class LSDQCGPModel(nn.Module):
         static_semantic = (t_proj * semantic_weights).sum(dim=1) / semantic_count.to(t_proj.dtype)
 
         # The stored features use the standard CLIP token layout (SOT, content,
-        # EOT, padding). Keep all valid tokens for E_static, but prevent the
-        # occurrence-conditioned selector from collapsing onto SOT/EOT whenever
-        # at least one content token is available.
+        # EOT, padding). Keep all valid tokens for E_static. SOT is always the
+        # first valid token, but the last valid token is EOT only when EOT occurs
+        # inside the max_q_l window. If the final window position is still valid,
+        # the sequence may have been truncated before EOT, so conservatively keep
+        # that last token as content.
         token_select_mask = semantic_mask.clone()
         for batch_index in range(token_select_mask.shape[0]):
             valid_indices = torch.nonzero(
@@ -161,7 +163,9 @@ class LSDQCGPModel(nn.Module):
             ).flatten()
             if valid_indices.numel() > 2:
                 token_select_mask[batch_index, valid_indices[0]] = False
-                token_select_mask[batch_index, valid_indices[-1]] = False
+                eot_is_observed = not bool(semantic_mask[batch_index, -1])
+                if eot_is_observed:
+                    token_select_mask[batch_index, valid_indices[-1]] = False
 
         # 3. Concatenate and pass through Transformer backbone
         src = torch.cat([v_proj, t_proj], dim=1)

@@ -164,6 +164,12 @@ class TestTokenLSDQCGPModel(unittest.TestCase):
                 outputs["token_attention"][0, :, 15:], torch.zeros(10, 5)
             )
         )
+        # Sample 1 fills the complete max-length window. Its final valid token
+        # may be truncated content rather than EOT and must remain selectable.
+        self.assertTrue(
+            torch.equal(outputs["token_attention"][1, :, 0], torch.zeros(10))
+        )
+        self.assertTrue(torch.all(outputs["token_attention"][1, :, -1] > 0))
 
         model.eval()
         with torch.no_grad():
