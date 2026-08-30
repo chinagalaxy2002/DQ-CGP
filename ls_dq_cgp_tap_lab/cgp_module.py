@@ -100,10 +100,12 @@ class LateSemanticCGP(nn.Module):
                         nn.init.zeros_(layer.bias)
         nn.init.xavier_uniform_(self.frf_v_proj.weight)
         nn.init.zeros_(self.frf_v_proj.bias)
-        nn.init.xavier_uniform_(self.prompt_query_proj.weight)
+        # Baseline-preserving QAP initialization: start exactly at MeanPool(P),
+        # then learn candidate-specific attention during training.
+        nn.init.zeros_(self.prompt_query_proj.weight)
         nn.init.zeros_(self.prompt_query_proj.bias)
         nn.init.xavier_uniform_(self.prompt_key_proj.weight)
-        nn.init.xavier_uniform_(self.prompt_value_proj.weight)
+        nn.init.eye_(self.prompt_value_proj.weight)
         nn.init.xavier_uniform_(self.visual_proj.weight)
         nn.init.zeros_(self.visual_proj.bias)
         nn.init.xavier_uniform_(self.semantic_proj.weight)
@@ -115,6 +117,7 @@ class LateSemanticCGP(nn.Module):
         static_semantic: Tensor,      # E_static: [B, D]
         query_states: Tensor,         # h_q: [B, Q, D] from D2
         static_bypass: bool = False,  # If True, counterfactual bypass with E_static
+        uniform_prompt_pool: bool = False,  # If True, force alpha_{q,p} = 1/P
     ) -> LSDQCGPOutput:
         bsz, num_queries, dim = visual_context.shape
         # Expand static semantic across all queries: [B, Q, D]
@@ -139,7 +142,12 @@ class LateSemanticCGP(nn.Module):
         prompt_logits = torch.einsum(
             "bqd,bqpd->bqp", prompt_query, prompt_keys
         ) / math.sqrt(self.hidden_dim)                                         # [B, Q, P]
-        prompt_attention = torch.softmax(prompt_logits, dim=-1)                # [B, Q, P]
+        if uniform_prompt_pool:
+            prompt_attention = torch.full_like(
+                prompt_logits, 1.0 / self.prompt_length
+            )                                                                   # [B, Q, P]
+        else:
+            prompt_attention = torch.softmax(prompt_logits, dim=-1)            # [B, Q, P]
         pooled_prompt = torch.einsum(
             "bqp,bqpd->bqd", prompt_attention, prompt_values
         )                                                                       # [B, Q, D]

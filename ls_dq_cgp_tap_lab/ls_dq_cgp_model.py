@@ -115,6 +115,7 @@ class LSDQCGPModel(nn.Module):
         )
         self.static_bypass = False
         self.context_roll = False
+        self.uniform_prompt_pool = False
 
     def forward(
         self,
@@ -179,6 +180,7 @@ class LSDQCGPModel(nn.Module):
             static_semantic=static_semantic,
             query_states=d2_queries,
             static_bypass=self.static_bypass,
+            uniform_prompt_pool=self.uniform_prompt_pool,
         )
 
         out = {

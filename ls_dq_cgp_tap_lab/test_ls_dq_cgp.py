@@ -37,6 +37,36 @@ class TestLSDQCGP(unittest.TestCase):
             out_active.prompt_attention.sum(dim=-1),
             torch.ones(bsz, num_queries),
         )
+        expected_uniform = torch.full_like(out_active.prompt_attention, 1.0 / 6)
+        torch.testing.assert_close(out_active.prompt_attention, expected_uniform)
+        torch.testing.assert_close(
+            out_active.pooled_prompt,
+            cgp.basis_norm(out_active.prompt_sequence.mean(dim=2)),
+        )
+
+        # Baseline-preserving initialization: W_Q=0 and W_V=I.
+        torch.testing.assert_close(
+            cgp.prompt_query_proj.weight,
+            torch.zeros_like(cgp.prompt_query_proj.weight),
+        )
+        torch.testing.assert_close(
+            cgp.prompt_value_proj.weight,
+            torch.eye(dim),
+        )
+
+        # Once attention becomes non-uniform, the counterfactual must still
+        # force alpha=1/P without bypassing W_V or the downstream modules.
+        nn_init_state = torch.random.get_rng_state()
+        torch.manual_seed(7)
+        torch.nn.init.xavier_uniform_(cgp.prompt_query_proj.weight)
+        torch.random.set_rng_state(nn_init_state)
+        out_learned = cgp(v_q, e_static, h_q)
+        out_uniform = cgp(v_q, e_static, h_q, uniform_prompt_pool=True)
+        torch.testing.assert_close(out_uniform.prompt_attention, expected_uniform)
+        self.assertGreater(
+            (out_learned.prompt_attention - out_uniform.prompt_attention).abs().max().item(),
+            1e-4,
+        )
 
         # Check that visual_context gradient is blocked (stop-gradient)
         loss = out_active.pred_logits.sum()
@@ -100,6 +130,14 @@ class TestLSDQCGP(unittest.TestCase):
                 src_vid=src_vid,
                 src_vid_mask=src_vid_mask,
             )
+            model.uniform_prompt_pool = True
+            uniform_outputs = model(
+                src_txt=src_txt,
+                src_txt_mask=src_txt_mask,
+                src_vid=src_vid,
+                src_vid_mask=src_vid_mask,
+            )
+            model.uniform_prompt_pool = False
             model.context_roll = True
             rolled_outputs = model(
                 src_txt=src_txt,
@@ -107,6 +145,10 @@ class TestLSDQCGP(unittest.TestCase):
                 src_vid=src_vid,
                 src_vid_mask=src_vid_mask,
             )
+        torch.testing.assert_close(
+            uniform_outputs["prompt_attention"],
+            torch.full_like(uniform_outputs["prompt_attention"], 1.0 / 6),
+        )
         self.assertGreater(
             (active_outputs["pred_logits"] - rolled_outputs["pred_logits"]).abs().max().item(),
             1e-4,

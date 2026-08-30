@@ -93,6 +93,8 @@ def main():
         "native_binding_coef": args.native_bind_coef,
         "num_basis": args.num_basis,
         "prompt_length": args.prompt_length,
+        "prompt_pooling": "query_conditioned_attention",
+        "qap_initialization": "mean_pool_preserving",
         "query_cgp_use_semantic_mask": True,
         "epochs": args.epochs,
         "lr": args.lr,

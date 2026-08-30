@@ -43,6 +43,11 @@ def main():
     counterfactual = parser.add_mutually_exclusive_group()
     counterfactual.add_argument("--static_bypass", action="store_true", help="Enable static text bypass counterfactual")
     counterfactual.add_argument("--context_roll", action="store_true", help="Enable context roll permutation counterfactual")
+    counterfactual.add_argument(
+        "--uniform_prompt_pool",
+        action="store_true",
+        help="Force uniform pooling over prompt positions while keeping QAP value projection active",
+    )
     parser.add_argument("--eval_bsz", type=int, default=4, help="Evaluation batch size")
     args = parser.parse_args()
 
@@ -85,6 +90,8 @@ def main():
         mode_name = "static_bypass"
     elif args.context_roll:
         mode_name = "context_roll"
+    elif args.uniform_prompt_pool:
+        mode_name = "uniform_prompt_pool"
     else:
         mode_name = "active"
 
@@ -114,6 +121,7 @@ def main():
     model.eval()
     model.static_bypass = args.static_bypass
     model.context_roll = args.context_roll
+    model.uniform_prompt_pool = args.uniform_prompt_pool
 
     logger.info(f"Running inference on {args.split} (Mode: {mode_name})...")
     with torch.no_grad():
