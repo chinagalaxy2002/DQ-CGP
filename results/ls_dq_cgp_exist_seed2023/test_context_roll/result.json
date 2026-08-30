@@ -1,0 +1,31 @@
+{
+  "variant": "ls_dq_cgp_exist",
+  "has_exist_head": true,
+  "mode": "context_roll",
+  "split": "test",
+  "checkpoint": "<repo>/outputs/ls_dq_cgp_exist_seed2023/best.ckpt",
+  "checkpoint_epoch": 124,
+  "brief": {
+    "AUROC": 75.83,
+    "Rej-F1@0.4": 53.05,
+    "Acc@0.4": 63.61,
+    "Rej-F1@0.6": 72.2,
+    "Acc@0.6": 69.31,
+    "G-mIoU@1": 31.45,
+    "G-mIoU@3": 25.53,
+    "G-mIoU@5": 23.62,
+    "mAP": 17.16,
+    "mR@1": 11.22,
+    "mR@3": 17.9,
+    "mR@5": 23.87,
+    "mR+@1": 0.0,
+    "mR+@3": 2.45,
+    "mR+@5": 7.51,
+    "mIoU@1": 25.79,
+    "mIoU@3": 24.08,
+    "mIoU@5": 23.93,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 5.53,
+    "mIoU+@5": 5.16
+  }
+}

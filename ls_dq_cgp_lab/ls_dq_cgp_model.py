@@ -114,6 +114,7 @@ class LSDQCGPModel(nn.Module):
             temperature=temperature,
         )
         self.static_bypass = False
+        self.context_roll = False
 
     def forward(
         self,
@@ -167,6 +168,10 @@ class LSDQCGPModel(nn.Module):
         vid_mem = memory[:, :v_proj.shape[1]]                     # [B, T_vid, d]
         v_context = torch.bmm(d1_attention, vid_mem)              # [B, Q, d]
 
+        # Context Roll counterfactual: query i gets visual context from query i-1
+        if self.context_roll:
+            v_context = v_context.roll(shifts=1, dims=1)
+
         # 6. Apply Late-Semantic CGP to produce pred_logits
         d2_queries = hs[-1]                                       # [B, Q, d]
         cgp_out: LSDQCGPOutput = self.cgp(
@@ -183,10 +188,14 @@ class LSDQCGPModel(nn.Module):
             "semantic_scores": cgp_out.semantic_scores,
         }
 
-        # 7. Saliency
+        # 7. Existence Head if enabled
+        if self.base_model.exist_head is not None:
+            out["pred_exist_logits"] = self.base_model.exist_head(hs[-1])
+
+        # 8. Saliency
         out["saliency_scores"] = self.base_model.saliency_proj(vid_mem).squeeze(-1)
 
-        # 8. Aux outputs if enabled
+        # 9. Aux outputs if enabled
         if self.base_model.aux_loss:
             aux_logits = self.base_model.class_embed(hs[:-1])
             out["aux_outputs"] = [

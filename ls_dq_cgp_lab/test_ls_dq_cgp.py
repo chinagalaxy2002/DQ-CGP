@@ -52,6 +52,8 @@ class TestLSDQCGP(unittest.TestCase):
         opt.num_queries = 10
         opt.enc_layers = 2
         opt.dec_layers = 2
+        opt.use_exist_head = True
+        opt.mr_only = False
 
         base_model, criterion = build_model(opt)
         model = LSDQCGPModel(base_model)
@@ -77,10 +79,35 @@ class TestLSDQCGP(unittest.TestCase):
 
         self.assertIn("pred_logits", outputs)
         self.assertIn("pred_spans", outputs)
+        self.assertIn("pred_exist_logits", outputs)
         self.assertEqual(outputs["pred_logits"].shape, (bsz, 10, 2))
         self.assertEqual(outputs["pred_spans"].shape, (bsz, 10, 2))
+        self.assertEqual(outputs["pred_exist_logits"].shape, (bsz,))
+
+        model.eval()
+        with torch.no_grad():
+            active_outputs = model(
+                src_txt=src_txt,
+                src_txt_mask=src_txt_mask,
+                src_vid=src_vid,
+                src_vid_mask=src_vid_mask,
+            )
+            model.context_roll = True
+            rolled_outputs = model(
+                src_txt=src_txt,
+                src_txt_mask=src_txt_mask,
+                src_vid=src_vid,
+                src_vid_mask=src_vid_mask,
+            )
+        self.assertGreater(
+            (active_outputs["pred_logits"] - rolled_outputs["pred_logits"]).abs().max().item(),
+            1e-4,
+        )
+        model.context_roll = False
+        model.train()
 
         targets = {
+            "exist_label": torch.tensor([1.0, 1.0]),
             "span_labels": [
                 {"spans": torch.tensor([[0.2, 0.1], [0.5, 0.2]])},
                 {"spans": torch.tensor([[0.7, 0.15]])},
@@ -91,6 +118,7 @@ class TestLSDQCGP(unittest.TestCase):
         self.assertIn("loss_native_bind", losses)
         self.assertIn("loss_label", losses)
         self.assertIn("loss_span", losses)
+        self.assertIn("loss_exist", losses)
 
         total_loss = sum(losses[k] * criterion.weight_dict.get(k, 1.0) for k in losses)
         total_loss.backward()

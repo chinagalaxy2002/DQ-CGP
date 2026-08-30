@@ -1,4 +1,4 @@
-"""Evaluation script for LS-DQ-CGP (supports active and static_bypass modes with official GMR metrics)."""
+"""Evaluation script for LS-DQ-CGP (supports active, static_bypass, and context_roll modes with official GMR metrics)."""
 
 from __future__ import annotations
 
@@ -40,13 +40,23 @@ def main():
     parser.add_argument("--output", required=True, help="Output directory")
     parser.add_argument("--gpu", type=int, default=0, help="CUDA device index")
     parser.add_argument("--device", default="cuda", help="Computation device")
-    parser.add_argument("--static_bypass", action="store_true", help="Enable static text bypass counterfactual")
+    counterfactual = parser.add_mutually_exclusive_group()
+    counterfactual.add_argument("--static_bypass", action="store_true", help="Enable static text bypass counterfactual")
+    counterfactual.add_argument("--context_roll", action="store_true", help="Enable context roll permutation counterfactual")
     parser.add_argument("--eval_bsz", type=int, default=4, help="Evaluation batch size")
     args = parser.parse_args()
 
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
     output = Path(args.output).resolve()
     output.mkdir(parents=True, exist_ok=True)
+
+    # Load checkpoint state first to detect exist_head
+    ckpt_path = Path(args.checkpoint).resolve()
+    logger.info(f"Loading checkpoint from {ckpt_path}...")
+    ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+    state_dict = ckpt["model"] if "model" in ckpt else ckpt
+
+    has_exist_head = any("exist_head" in key for key in state_dict)
 
     manager = BaseOptions("moment_detr", "soccer_gmr", "clip_slowfast")
     manager.parse()
@@ -60,19 +70,33 @@ def main():
     opt.eval_path = str(label_path)
     opt.t_feat_dir = str(ROOT / "Soccergmr/clip_text")
     opt.v_feat_dirs = [str(ROOT / "Soccergmr/clip"), str(ROOT / "Soccergmr/slowfast")]
-    opt.mr_only = True
+    opt.query_cgp_use_semantic_mask = True
+    opt.use_exist_head = has_exist_head
+    if has_exist_head:
+        opt.exist_loss_coef = 1.0
+        opt.exist_gate_thd = 0.3
+        opt.exist_pool = "max"
+        opt.mr_only = False
+    else:
+        opt.mr_only = True
     opt.lw_saliency = 0
 
-    mode_name = "static_bypass" if args.static_bypass else "active"
+    if args.static_bypass:
+        mode_name = "static_bypass"
+    elif args.context_roll:
+        mode_name = "context_roll"
+    else:
+        mode_name = "active"
+
     save_filename = f"moment_detr_gmr_{args.split}_submission.jsonl"
 
     # Dataset configuration
     dset_config = build_dataset_config(opt, opt.eval_path, load_labels=False)
-    if args.split == "test":
+    if args.split == "test" or has_exist_head:
         dset_config.keep_empty_gt = True
     eval_dataset = StartEndDataset(**dset_config)
 
-    # Build model
+    # Build model with exist_head if checkpoint had it
     base_model, _ = build_base_model(opt)
     model = LSDQCGPModel(
         base_model=base_model,
@@ -83,17 +107,13 @@ def main():
         temperature=1.0,
     )
 
-    # Load checkpoint
-    ckpt_path = Path(args.checkpoint).resolve()
-    logger.info(f"Loading checkpoint from {ckpt_path}...")
-    ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-    state_dict = ckpt["model"] if "model" in ckpt else ckpt
     missing, unexpected = model.load_state_dict(state_dict, strict=False)
-    logger.info(f"Loaded checkpoint (epoch {ckpt.get('epoch', -1)}). Missing: {len(missing)}, Unexpected: {len(unexpected)}")
+    logger.info(f"Loaded checkpoint (epoch {ckpt.get('epoch', -1)}, exist_head={has_exist_head}). Missing: {len(missing)}, Unexpected: {len(unexpected)}")
 
     model.to(opt.device)
     model.eval()
     model.static_bypass = args.static_bypass
+    model.context_roll = args.context_roll
 
     logger.info(f"Running inference on {args.split} (Mode: {mode_name})...")
     with torch.no_grad():
@@ -112,7 +132,8 @@ def main():
     metrics_path.write_text(json.dumps(metrics, ensure_ascii=False, indent=2) + "\n")
     
     result_record = {
-        "variant": "ls_dq_cgp",
+        "variant": "ls_dq_cgp_exist" if has_exist_head else "ls_dq_cgp",
+        "has_exist_head": has_exist_head,
         "mode": mode_name,
         "split": args.split,
         "checkpoint": str(ckpt_path),
@@ -122,7 +143,7 @@ def main():
     (output / "result.json").write_text(json.dumps(result_record, indent=2) + "\n")
     
     print("\n" + "=" * 60)
-    print(f"LS-DQ-CGP Evaluation Summary [{args.split.upper()}] (Mode: {mode_name})")
+    print(f"LS-DQ-CGP Evaluation Summary [{args.split.upper()}] (Mode: {mode_name}, Exist Head: {has_exist_head})")
     print("=" * 60)
     for k, v in metrics["brief"].items():
         print(f"{k:15s}: {v}")

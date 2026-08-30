@@ -38,12 +38,16 @@ def main():
     parser.add_argument("--output", default="outputs/ls_dq_cgp_seed2023", help="Output directory")
     parser.add_argument("--seed", type=int, default=2023, help="Random seed")
     parser.add_argument("--device", default="cuda", help="Computation device")
-    parser.add_argument("--gpu", type=int, default=1, help="CUDA device index")
+    parser.add_argument("--gpu", type=int, default=0, help="CUDA device index")
     parser.add_argument("--epochs", type=int, default=400, help="Number of epochs")
     parser.add_argument("--lr", type=float, default=5e-5, help="Learning rate")
     parser.add_argument("--native_bind_coef", type=float, default=0.2, help="Coefficient for D1 binding loss")
     parser.add_argument("--num_basis", type=int, default=16, help="Number of learnable basis prompts")
     parser.add_argument("--prompt_length", type=int, default=6, help="Prompt token length")
+    existence = parser.add_mutually_exclusive_group()
+    existence.add_argument("--use_exist_head", action="store_true", help="Enable GMR existence head")
+    existence.add_argument("--no_exist_head", action="store_false", dest="use_exist_head", help="Disable GMR existence head")
+    parser.set_defaults(use_exist_head=False)
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing output directory")
     args = parser.parse_args()
 
@@ -72,17 +76,24 @@ def main():
     opt.eval_path = str(ROOT / "data/label/Standard/val.jsonl")
     opt.t_feat_dir = str(ROOT / "Soccergmr/clip_text")
     opt.v_feat_dirs = [str(ROOT / "Soccergmr/clip"), str(ROOT / "Soccergmr/slowfast")]
-    opt.mr_only = True
+    opt.mr_only = not args.use_exist_head
     opt.lw_saliency = 1
-    opt.component_variant = "ls_dq_cgp"
+    opt.use_exist_head = bool(args.use_exist_head)
+    opt.exist_loss_coef = 1.0
+    opt.exist_gate_thd = 0.3
+    opt.exist_pool = "max"
+    opt.query_cgp_use_semantic_mask = True
+    opt.component_variant = "ls_dq_cgp_exist" if args.use_exist_head else "ls_dq_cgp"
 
     experiment_meta = {
-        "variant": "ls_dq_cgp",
+        "variant": opt.component_variant,
         "seed": args.seed,
         "model": "LateSemantic_MomentDETR",
+        "use_exist_head": args.use_exist_head,
         "native_binding_coef": args.native_bind_coef,
         "num_basis": args.num_basis,
         "prompt_length": args.prompt_length,
+        "query_cgp_use_semantic_mask": True,
         "epochs": args.epochs,
         "lr": args.lr,
     }
@@ -95,9 +106,9 @@ def main():
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(args.seed)
 
-    # Prepare datasets
+    # Prepare datasets (keep_empty_gt=True for training when exist head is active)
     train_dataset = StartEndDataset(
-        **build_dataset_config(opt, opt.train_path, load_labels=True, keep_empty_gt=True)
+        **build_dataset_config(opt, opt.train_path, load_labels=True, keep_empty_gt=bool(args.use_exist_head))
     )
     val_dataset = StartEndDataset(
         **build_dataset_config(opt, opt.eval_path, load_labels=True, keep_empty_gt=False)
@@ -125,7 +136,7 @@ def main():
     optimizer = torch.optim.AdamW(param_dicts, lr=opt.lr, weight_decay=opt.wd)
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, opt.lr_drop)
 
-    logger.info(f"Starting LS-DQ-CGP training with seed {args.seed}, total epochs {args.epochs}...")
+    logger.info(f"Starting LS-DQ-CGP training with exist_head={args.use_exist_head}, semantic_mask={opt.query_cgp_use_semantic_mask}, seed={args.seed}, total epochs={args.epochs}...")
     train(model, criterion, optimizer, lr_scheduler, train_dataset, val_dataset, opt)
 
 
