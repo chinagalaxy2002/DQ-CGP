@@ -137,17 +137,18 @@ SportsMoments Test 全部为正例，全部负例均来自 WorldCup。模型可�
 
 ### 4.5 与主要 baseline 的总体对比
 
-仓库已有的 Seed-2023 Standard Test 结果可用于总体 baseline 对比。为避免跨 checkpoint 拼接，DQ-CGPv3 使用 reproduced checkpoint 的配套结果。
+仓库已有的 Seed-2023 Standard Test 结果可用于总体 baseline 对比。历史总体表使用 reproduced DQ-CGPv3 checkpoint；本次对发布 checkpoint 的重测结果单独列出，避免跨 checkpoint 拼接。
 
 | 方法 | mAP | mR@1 | mR@3 | mR@5 | mR+@5 | mIoU@1 | mIoU@5 | mIoU+@5 | AUROC | G-mIoU@1 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Moment-DETR-GMR Baseline | 6.14 | 4.16 | 6.48 | 7.89 | 0.69 | 12.30 | 11.61 | 1.54 | 71.87 | 5.67 |
 | Native Binding | 14.46 | 9.90 | 16.13 | 19.77 | 4.43 | 25.42 | 24.19 | 6.21 | **76.69** | 30.07 |
-| DQ-CGPv3 | 17.72 | 11.92 | **19.35** | 23.59 | **10.20** | 28.80 | 26.29 | 8.39 | 76.23 | 32.23 |
+| DQ-CGPv3（reproduced checkpoint，历史总体结果） | 17.72 | 11.92 | **19.35** | 23.59 | **10.20** | 28.80 | 26.29 | 8.39 | 76.23 | 32.23 |
+| DQ-CGPv3（发布 checkpoint，Test 重测） | 15.51 | 9.65 | 16.91 | 22.45 | 7.16 | 25.84 | 23.56 | 6.93 | **77.33** | **43.25** |
 | LS-DQ-CGP（无 Exist） | 16.65 | 10.84 | 18.08 | 21.78 | 8.44 | 25.97 | 24.07 | 7.12 | 75.04 | 15.40 |
 | **LS-DQ-CGP + Exist** | **18.07** | **12.35** | 18.74 | **24.49** | 8.71 | **30.03** | **27.01** | **9.35** | 75.83 | **32.39** |
 
-相对 Moment-DETR-GMR Baseline，LS-DQ-CGP + Exist 的 mAP 提高 11.93，mR@5 提高 16.60，mIoU@1 提高 17.73，G-mIoU@1 提高 26.72。相对 Native Binding，mAP 提高 3.61；相对 DQ-CGPv3，mAP 提高 0.35。DQ-CGPv3 仍在 mR@3 和多目标 mR+@5 上更强，Native Binding 的 AUROC 最高。因此，当前结果支持 LS-DQ-CGP 在总体定位质量、Top-5 检索和多目标 IoU 方面更好，但不能声称它在多目标召回或存在性判断上全面领先。
+相对 Moment-DETR-GMR Baseline，LS-DQ-CGP + Exist 的 mAP 提高 11.93，mR@5 提高 16.60，mIoU@1 提高 17.73，G-mIoU@1 提高 26.72。相对 Native Binding，mAP 提高 3.61；相对 reproduced DQ-CGPv3，mAP 提高 0.35。DQ-CGPv3 的 reproduced checkpoint 仍在 mR@3 和多目标 mR+@5 上更强；发布 checkpoint 的重测则有更高 AUROC 与 G-mIoU@1，但更低 mAP。两套 DQ-CGPv3 checkpoint 不可混合比较。当前结果支持 LS-DQ-CGP 在总体定位质量、Top-5 检索和多目标 IoU 方面更好，但不能声称它在多目标召回或存在性判断上全面领先。
 
 正式分桶对比建议至少纳入以下三层 baseline：
 
@@ -155,7 +156,7 @@ SportsMoments Test 全部为正例，全部负例均来自 WorldCup。模型可�
 2. Native Binding：控制 D1 binding supervision 后，衡量 late-semantic inference path 的增量；
 3. DQ-CGPv3：比较 late-semantic 与 intermediate residual 两种 CGP 注入位置的能力边界。
 
-当前仓库保存了这些 baseline 的总体机器可读指标，但 Baseline 和 DQ-CGPv3 的逐 Test-query prediction JSONL 未与本轮分桶文件放在一起。执行分桶 baseline 对比时，应优先从对应 checkpoint 重新导出 prediction JSONL；若无法获得逐查询预测，则只报告总体 baseline 表，不推测其分桶表现。
+Plain Moment-DETR-GMR 与早期 Native Binding 仅保留了归档的总体 Test 指标，不能据此推测其分桶表现。DQ-CGPv3 的发布 checkpoint 已在 `outputs/dq_cgp_v3_seed2023/test_recheck/` 重测并导出逐 Test-query prediction JSONL，因此可用于 Full 与 DQ-CGPv3（发布 checkpoint）的分桶比较；该结果不与 reproduced DQ-CGPv3 checkpoint 的总体表混用。
 
 ## 5. 正式分桶定义
 
