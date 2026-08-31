@@ -73,6 +73,20 @@ D2 final query ─────────→ pred_logits (Relevance Score)
 
 同 checkpoint 反事实评测中，Active / Static Bypass / Context Roll 的 mAP 分别为 **18.07 / 11.53 / 17.16**；三者 AUROC 均为 75.83，说明 existence 判别与语义排序消融已经解耦。
 
+### 2.1 LS-DQ-CGP + QAP：Query-conditioned Attentive Prompt Pooling（探索性版本）
+
+QAP 保留原有 `Bind → Adapt → Match` 路径，仅将 BPS 的 6-token mean pooling 替换为由 $[V_q;E_{static}]$ 条件化的 attention pooling。该实现采用 baseline-preserving initialization：$W_Q=0$、$b_Q=0$、$W_V=I$，因此训练初始时严格退化为原始 MeanPool；同时提供 `uniform_prompt_pool` 反事实，用于区分 attentive composition 与额外 Q/K/V 参数的贡献。该组合是 factorized composition：**Basis Routing × Prompt Position Attention**，不是对 $16\times6$ 个 basis tokens 独立路由。
+
+当前 Seed 2023 结果如下。QAP 最佳验证 checkpoint 为 Epoch 135，训练在 Epoch 185 early stop。
+
+| 方法 | Test mAP | mR@1 | mR@3 | mR@5 | mIoU@1 | G-mIoU@1 | AUROC |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 原 LS-DQ-CGP + Exist | **18.07** | **12.35** | **18.74** | **24.49** | **30.03** | **32.39** | **75.83** |
+| QAP Active | 14.49 | 9.80 | 16.42 | 19.70 | 26.05 | 30.58 | 74.98 |
+| QAP UniformPrompt | 14.49 | 9.80 | 16.42 | 19.70 | 26.05 | 30.58 | 74.98 |
+
+QAP 的最佳验证 MR-full-mAP 为 **20.23**（原 LS-DQ-CGP 为 19.99），但该小幅验证集提升没有迁移到 Test；Active 与 UniformPrompt 的全部官方指标完全一致。因而当前实验不支持 attentive prompt composition 作为主方法，建议将其保留为负结果/消融。代码位于 `ls_dq_cgp_tap_lab/`，训练输出和 checkpoint 默认写入 `outputs/ls_dq_cgp_tap_exist_seed2023/`（不纳入 Git）。
+
 > 指标口径说明：DQ-CGPv3 列统一采用 reproduced checkpoint 的配套结果（mAP 17.72、AUROC 76.23）。released checkpoint 的另一套结果是 mAP 15.51、AUROC 77.33，不再跨 checkpoint 拼接展示。
 
 > 📌 **详细评测文件**：
@@ -144,6 +158,35 @@ python ls_dq_cgp_lab/evaluate_ls_dq_cgp.py \
   --gpu 0
 ```
 
+### 4.3 QAP 探索性版本与 UniformPrompt 反事实
+
+```bash
+# 训练 QAP + Existence Head（baseline-preserving initialization）
+python ls_dq_cgp_tap_lab/train_ls_dq_cgp.py \
+  --output outputs/ls_dq_cgp_tap_exist_seed2023 \
+  --gpu 0 \
+  --seed 2023 \
+  --epochs 400 \
+  --lr 5e-5 \
+  --native_bind_coef 0.2 \
+  --use_exist_head
+
+# Active QAP
+python ls_dq_cgp_tap_lab/evaluate_ls_dq_cgp.py \
+  --checkpoint outputs/ls_dq_cgp_tap_exist_seed2023/best.ckpt \
+  --output outputs/ls_dq_cgp_tap_exist_seed2023/test_active \
+  --split test \
+  --gpu 0
+
+# UniformPrompt：仅强制 alpha_{q,p}=1/6，其余模块不变
+python ls_dq_cgp_tap_lab/evaluate_ls_dq_cgp.py \
+  --checkpoint outputs/ls_dq_cgp_tap_exist_seed2023/best.ckpt \
+  --output outputs/ls_dq_cgp_tap_exist_seed2023/test_uniform_prompt_pool \
+  --split test \
+  --uniform_prompt_pool \
+  --gpu 0
+```
+
 ---
 
 ## 5. 代码结构
@@ -157,6 +200,13 @@ ls_dq_cgp_lab/                           # LS-DQ-CGP 独立实验与核心代码
 ├── run_experiment.sh                    # 一键训练与评估流水线
 ├── run_experiment_with_exist.sh         # Exist 版本：训练及三种 Test 模式
 └── test_ls_dq_cgp.py                    # 单元回归测试
+
+ls_dq_cgp_tap_lab/                       # QAP 探索性版本（含 UniformPrompt 反事实）
+├── cgp_module.py                        # RCG, BPS, QAP, FRF 与语义匹配
+├── ls_dq_cgp_model.py                   # 模型组装、Native Binding Loss、QAP diagnostic
+├── train_ls_dq_cgp.py                   # QAP 训练入口
+├── evaluate_ls_dq_cgp.py                # Active / UniformPrompt / 其他反事实评估
+└── test_ls_dq_cgp.py                    # QAP 形状、初始化、梯度回归测试
 
 experiments/vmr_cgp/                     # 原版 DQ-CGP V3 代码
 models/moment_detr_gmr/                  # Moment-DETR-GMR 主干实现
