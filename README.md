@@ -91,6 +91,18 @@ QAP 的可审计训练与评估记录（不含 checkpoint 或预测 JSONL）已�
 
 > 指标口径说明：DQ-CGPv3 列统一采用 reproduced checkpoint 的配套结果（mAP 17.72、AUROC 76.23）。released checkpoint 的另一套结果是 mAP 15.51、AUROC 77.33，不再跨 checkpoint 拼接展示。
 
+### 2.2 Token-Selective LS-DQ-CGP（已上传代码与日志）
+
+`ls_dq_cgp_token_lab/` 实现 `Bind → Select → Adapt → Match`：每个 bound visual context $V_q$ 先对有效文本 token 做 occurrence-conditioned selection，再进入 RCG/BPS/FRF。Seed 2023 的最佳 checkpoint 为 Epoch 180，最佳验证 MR-full-mAP 为 **19.83**。
+
+| Test 模式 | mAP | mR@1 | mR@3 | mR@5 | mIoU@1 | G-mIoU@1 | AUROC |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Active | 16.05 | 10.94 | 17.95 | 21.56 | 26.50 | 25.22 | 76.32 |
+| Token Static | 16.19 | 10.95 | 17.92 | 21.69 | 26.74 | 25.30 | 76.32 |
+| Context Roll | 14.81 | 9.84 | 15.64 | 19.89 | 23.66 | 24.76 | 76.32 |
+
+训练、验证和完整测试运行日志已归档至 [`results/token_ls_dq_cgp_exist_seed2023/`](results/token_ls_dq_cgp_exist_seed2023/)，包括 [`train.log`](results/token_ls_dq_cgp_exist_seed2023/train.log)、[`val.log`](results/token_ls_dq_cgp_exist_seed2023/val.log)、[`run.log`](results/token_ls_dq_cgp_exist_seed2023/run.log) 及三种测试模式的指标文件。预测 JSONL 与 checkpoint 未上传。
+
 > 📌 **详细评测文件**：
 > - [LS-DQ-CGP + Existence Head 完整结果与反事实分析](results/ls_dq_cgp_exist_seed2023/RESULTS.md)
 > - [LS-DQ-CGP 结果与消融分析报告](results/ls_dq_cgp_seed2023/RESULTS.md)
@@ -210,11 +222,20 @@ ls_dq_cgp_tap_lab/                       # QAP 探索性版本（含 UniformProm
 ├── evaluate_ls_dq_cgp.py                # Active / UniformPrompt / 其他反事实评估
 └── test_ls_dq_cgp.py                    # QAP 形状、初始化、梯度回归测试
 
+ls_dq_cgp_token_lab/                     # Token-Selective LS-DQ-CGP
+├── cgp_module.py                        # 文本 token selection、RCG, BPS, FRF 与匹配
+├── ls_dq_cgp_model.py                   # 模型组装、Native Binding Loss、token diagnostic
+├── train_ls_dq_cgp.py                   # Token-Selective 训练入口
+├── evaluate_ls_dq_cgp.py                # Active / Token Static / Context Roll 评估
+├── run_experiment_with_exist.sh         # Exist 版本训练及三种 Test 模式
+└── test_ls_dq_cgp.py                    # Token selection 回归测试
+
 experiments/vmr_cgp/                     # 原版 DQ-CGP V3 代码
 models/moment_detr_gmr/                  # Moment-DETR-GMR 主干实现
 training/moment_detr_gmr/                # 数据集与基础训练模块
 results/ls_dq_cgp_seed2023/              # LS-DQ-CGP 评测日志与指标记录
 results/ls_dq_cgp_exist_seed2023/        # Exist 版本完整日志、预测与评测报告
+results/token_ls_dq_cgp_exist_seed2023/  # Token-Selective 训练与测试日志、指标
 checkpoints/                             # 发布 Checkpoint 与 SHA256SUMS
 ```
 

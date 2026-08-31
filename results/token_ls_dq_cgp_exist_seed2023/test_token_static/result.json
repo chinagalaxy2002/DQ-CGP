@@ -1,0 +1,31 @@
+{
+  "variant": "token_ls_dq_cgp_exist",
+  "has_exist_head": true,
+  "mode": "token_static",
+  "split": "test",
+  "checkpoint": "/home/guoxiangyu/VLMbasedIter_momentretrival/DQ-CGP-github-publish/outputs/token_ls_dq_cgp_exist_seed2023/best.ckpt",
+  "checkpoint_epoch": 180,
+  "brief": {
+    "AUROC": 76.32,
+    "Rej-F1@0.4": 43.06,
+    "Acc@0.4": 61.2,
+    "Rej-F1@0.6": 58.14,
+    "Acc@0.6": 65.25,
+    "G-mIoU@1": 25.3,
+    "G-mIoU@3": 19.49,
+    "G-mIoU@5": 17.63,
+    "mAP": 16.19,
+    "mR@1": 10.95,
+    "mR@3": 17.92,
+    "mR@5": 21.69,
+    "mR+@1": 0.0,
+    "mR+@3": 3.36,
+    "mR+@5": 6.23,
+    "mIoU@1": 26.74,
+    "mIoU@3": 23.98,
+    "mIoU@5": 23.88,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 6.29,
+    "mIoU+@5": 6.12
+  }
+}
