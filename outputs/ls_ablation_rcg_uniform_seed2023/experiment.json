@@ -1,0 +1,12 @@
+{
+  "variant": "rcg_uniform",
+  "protocol": "from_scratch",
+  "seed": 2023,
+  "use_exist_head": true,
+  "mr_only": false,
+  "lw_saliency": 1,
+  "native_binding_coef": 0.2,
+  "epochs": 400,
+  "early_stop_patience": 50,
+  "lr": 5e-05
+}

@@ -1,0 +1,31 @@
+{
+  "variant": "rcg_uniform",
+  "protocol": "retrained",
+  "has_exist_head": true,
+  "split": "test",
+  "checkpoint": "<repo>/outputs/ls_ablation_rcg_uniform_seed2023/best.ckpt",
+  "checkpoint_epoch": 92,
+  "brief": {
+    "AUROC": 75.42,
+    "Rej-F1@0.4": 43.79,
+    "Acc@0.4": 61.58,
+    "Rej-F1@0.6": 74.02,
+    "Acc@0.6": 69.31,
+    "G-mIoU@1": 25.5,
+    "G-mIoU@3": 20.03,
+    "G-mIoU@5": 18.08,
+    "mAP": 16.77,
+    "mR@1": 10.27,
+    "mR@3": 19.2,
+    "mR@5": 24.76,
+    "mR+@1": 0.0,
+    "mR+@3": 4.55,
+    "mR+@5": 9.14,
+    "mIoU@1": 26.63,
+    "mIoU@3": 25.04,
+    "mIoU@5": 24.82,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 9.43,
+    "mIoU+@5": 8.82
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "variant": "bps_zero",
+  "protocol": "retrained",
+  "has_exist_head": true,
+  "split": "test",
+  "checkpoint": "<repo>/outputs/ls_ablation_bps_zero_seed2023/best.ckpt",
+  "checkpoint_epoch": 116,
+  "brief": {
+    "AUROC": 76.51,
+    "Rej-F1@0.4": 44.72,
+    "Acc@0.4": 61.58,
+    "Rej-F1@0.6": 70.29,
+    "Acc@0.6": 67.86,
+    "G-mIoU@1": 26.46,
+    "G-mIoU@3": 20.81,
+    "G-mIoU@5": 18.77,
+    "mAP": 17.37,
+    "mR@1": 11.34,
+    "mR@3": 19.49,
+    "mR@5": 23.51,
+    "mR+@1": 0.0,
+    "mR+@3": 4.65,
+    "mR+@5": 6.59,
+    "mIoU@1": 27.4,
+    "mIoU@3": 25.08,
+    "mIoU@5": 24.89,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 7.74,
+    "mIoU+@5": 7.38
+  }
+}

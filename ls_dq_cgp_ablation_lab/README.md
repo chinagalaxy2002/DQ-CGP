@@ -69,6 +69,25 @@ drops on multi-moment IoU. Claims about each module's achievable contribution
 must wait for the separately trained controls, because unchanged modules can
 adapt during retraining.
 
+## From-scratch controls (Seed 2023)
+
+All five controls were retrained from scratch with the matched optimizer,
+existence head, saliency supervision, Native Binding settings, and early-stopping
+rule. The table reports each best-validation checkpoint on the Standard Test
+split. The Full LS-DQ-CGP+Exist reference is `mAP = 18.07`.
+
+| Variant | Best checkpoint epoch | Test mAP | Delta mAP | mR@1 | mR@3 | mR@5 | AUROC |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `bps_zero` | 116 | **17.37** | -0.70 | 11.34 | 19.49 | 23.51 | 76.51 |
+| `rcg_uniform` | 92 | 16.77 | -1.30 | 10.27 | 19.20 | 24.76 | 75.42 |
+| `frf_remove` | 131 | 16.74 | -1.33 | 9.54 | 19.56 | 25.16 | 75.44 |
+| `bps_query_mean` | 117 | 15.70 | -2.37 | 9.73 | 18.65 | 22.61 | 76.62 |
+| `native_binding_exist_aligned` | 99 | 15.40 | -2.67 | 9.85 | 17.07 | 21.63 | 77.48 |
+
+The metrics, prediction JSONL files, per-epoch train/validation logs, and
+complete terminal logs are versioned in `outputs/ls_ablation_*` and `logs/`.
+Checkpoints are intentionally excluded because they are large binary artifacts.
+
 ## tmux launch
 
 Launch one Seed-2023 training and automatic Test evaluation:

@@ -1,0 +1,31 @@
+{
+  "variant": "bps_query_mean",
+  "protocol": "retrained",
+  "has_exist_head": true,
+  "split": "test",
+  "checkpoint": "<repo>/outputs/ls_ablation_bps_query_mean_seed2023/best.ckpt",
+  "checkpoint_epoch": 117,
+  "brief": {
+    "AUROC": 76.62,
+    "Rej-F1@0.4": 42.11,
+    "Acc@0.4": 60.71,
+    "Rej-F1@0.6": 73.02,
+    "Acc@0.6": 69.4,
+    "G-mIoU@1": 24.53,
+    "G-mIoU@3": 19.26,
+    "G-mIoU@5": 17.36,
+    "mAP": 15.7,
+    "mR@1": 9.73,
+    "mR@3": 18.65,
+    "mR@5": 22.61,
+    "mR+@1": 0.0,
+    "mR+@3": 4.6,
+    "mR+@5": 8.24,
+    "mIoU@1": 25.8,
+    "mIoU@3": 23.76,
+    "mIoU@5": 23.61,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 8.28,
+    "mIoU+@5": 7.86
+  }
+}

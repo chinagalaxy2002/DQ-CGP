@@ -1,0 +1,31 @@
+{
+  "variant": "frf_remove",
+  "protocol": "retrained",
+  "has_exist_head": true,
+  "split": "test",
+  "checkpoint": "<repo>/outputs/ls_ablation_frf_remove_seed2023/best.ckpt",
+  "checkpoint_epoch": 131,
+  "brief": {
+    "AUROC": 75.44,
+    "Rej-F1@0.4": 62.54,
+    "Acc@0.4": 65.54,
+    "Rej-F1@0.6": 71.94,
+    "Acc@0.6": 68.53,
+    "G-mIoU@1": 38.19,
+    "G-mIoU@3": 32.94,
+    "G-mIoU@5": 31.35,
+    "mAP": 16.74,
+    "mR@1": 9.54,
+    "mR@3": 19.56,
+    "mR@5": 25.16,
+    "mR+@1": 0.0,
+    "mR+@3": 4.47,
+    "mR+@5": 8.72,
+    "mIoU@1": 25.62,
+    "mIoU@3": 23.55,
+    "mIoU@5": 23.45,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 7.46,
+    "mIoU+@5": 7.22
+  }
+}

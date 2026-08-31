@@ -176,7 +176,7 @@ E_static + semantic_delta → E_adapt
 * `native_binding_exist_aligned`：保留 D1 Native Binding 与 existence head，移除 late-semantic CGP 和 semantic matcher；
 * `delta-zero`：严格固定 $\Delta E_q=0$ 的独立实验见 `strict_delta_zero_lab/`。
 
-每个变体均提供训练、测试和 tmux 启动脚本；详细干预定义、推理级 sanity check 结果和运行命令见 [`ls_dq_cgp_ablation_lab/README.md`](ls_dq_cgp_ablation_lab/README.md)。训练输出、日志和 checkpoint 默认写入 `outputs/`、`logs/`，不纳入 Git。
+每个变体均提供训练、测试和 tmux 启动脚本；详细干预定义、推理级 sanity check、最终重训 Test 结果和运行命令见 [`ls_dq_cgp_ablation_lab/README.md`](ls_dq_cgp_ablation_lab/README.md)。五组重训的指标、预测 JSONL 与日志已归档在 `outputs/ls_ablation_*` 和 `logs/`；checkpoint 不纳入 Git。
 
 ---
 
