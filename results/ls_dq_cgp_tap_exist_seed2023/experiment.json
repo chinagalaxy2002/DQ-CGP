@@ -1,0 +1,14 @@
+{
+  "variant": "ls_dq_cgp_tap_exist",
+  "seed": 2023,
+  "model": "LateSemantic_QAP_MomentDETR",
+  "use_exist_head": true,
+  "native_binding_coef": 0.2,
+  "num_basis": 16,
+  "prompt_length": 6,
+  "prompt_pooling": "query_conditioned_attention",
+  "qap_initialization": "mean_pool_preserving",
+  "query_cgp_use_semantic_mask": true,
+  "epochs": 400,
+  "lr": 5e-05
+}

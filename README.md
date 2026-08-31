@@ -87,6 +87,8 @@ QAP 保留原有 `Bind → Adapt → Match` 路径，仅将 BPS 的 6-token mean
 
 QAP 的最佳验证 MR-full-mAP 为 **20.23**（原 LS-DQ-CGP 为 19.99），但该小幅验证集提升没有迁移到 Test；Active 与 UniformPrompt 的全部官方指标完全一致。因而当前实验不支持 attentive prompt composition 作为主方法，建议将其保留为负结果/消融。代码位于 `ls_dq_cgp_tap_lab/`，训练输出和 checkpoint 默认写入 `outputs/ls_dq_cgp_tap_exist_seed2023/`（不纳入 Git）。
 
+QAP 的可审计训练与评估记录（不含 checkpoint 或预测 JSONL）已归档至 [`results/ls_dq_cgp_tap_exist_seed2023/`](results/ls_dq_cgp_tap_exist_seed2023/)：[`train.log`](results/ls_dq_cgp_tap_exist_seed2023/train.log)、[`val.log`](results/ls_dq_cgp_tap_exist_seed2023/val.log)、[`best_val_metrics.json`](results/ls_dq_cgp_tap_exist_seed2023/best_val_metrics.json)、[`Active metrics`](results/ls_dq_cgp_tap_exist_seed2023/test_active/metrics.json) 和 [`UniformPrompt metrics`](results/ls_dq_cgp_tap_exist_seed2023/test_uniform_prompt_pool/metrics.json)。
+
 > 指标口径说明：DQ-CGPv3 列统一采用 reproduced checkpoint 的配套结果（mAP 17.72、AUROC 76.23）。released checkpoint 的另一套结果是 mAP 15.51、AUROC 77.33，不再跨 checkpoint 拼接展示。
 
 > 📌 **详细评测文件**：
