@@ -119,6 +119,8 @@ class LSDQCGPModel(nn.Module):
         self.static_bypass = False
         self.context_roll = False
         self.token_static_bypass = False
+        self.uniform_text_attention = False
+        self.selector_context_roll = False
 
     def forward(
         self,
@@ -188,23 +190,34 @@ class LSDQCGPModel(nn.Module):
 
         # 5. Extract local visual context V_q from bound D1 attention
         d1_attention = self.capture.video_attention()            # [B, Q, T_vid]
-        vid_mem = memory[:, :v_proj.shape[1]]                     # [B, T_vid, d]
-        v_context = torch.bmm(d1_attention, vid_mem)              # [B, Q, d]
+        video_length = v_proj.shape[1]
+        vid_mem = memory[:, :video_length]                        # [B, T_vid, d]
+        txt_mem = memory[:, video_length:]                        # [B, T_txt, d]
+        bound_v_context = torch.bmm(d1_attention, vid_mem)        # [B, Q, d]
+        v_context = bound_v_context
 
         # Context Roll counterfactual: query i gets visual context from query i-1
         if self.context_roll:
             v_context = v_context.roll(shifts=1, dims=1)
+
+        # Selector-only Context Roll: only the occurrence-specific selector gets
+        # a mismatched V_q; RCG/FRF continue to receive the correct V_q above.
+        selector_context = None
+        if self.selector_context_roll:
+            selector_context = bound_v_context.roll(shifts=1, dims=1)
 
         # 6. Apply Late-Semantic CGP to produce pred_logits
         d2_queries = hs[-1]                                       # [B, Q, d]
         cgp_out: TokenLSDQCGPOutput = self.cgp(
             visual_context=v_context,
             static_semantic=static_semantic,
-            text_tokens=t_proj,
+            text_tokens=txt_mem,
             text_mask=token_select_mask,
             query_states=d2_queries,
             static_bypass=self.static_bypass,
             token_static_bypass=self.token_static_bypass,
+            selector_visual_context=selector_context,
+            uniform_text_attention=self.uniform_text_attention,
         )
 
         out = {

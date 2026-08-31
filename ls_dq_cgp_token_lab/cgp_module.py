@@ -12,7 +12,7 @@ Pipeline:
 from __future__ import annotations
 
 import math
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 import torch
 from torch import Tensor, nn
@@ -129,19 +129,34 @@ class TokenSelectiveLateSemanticCGP(nn.Module):
         visual_context: Tensor,
         text_tokens: Tensor,
         text_mask: Tensor,
+        selector_visual_context: Optional[Tensor] = None,
+        uniform_text_attention: bool = False,
     ) -> tuple[Tensor, Tensor]:
         """Use each bound V_q to read query-specific text semantics."""
-        v_detached = visual_context.detach()
+        selector_context = (
+            visual_context
+            if selector_visual_context is None
+            else selector_visual_context
+        )
+        v_detached = selector_context.detach()
         visual_query = self.selector_visual_proj(
             self.selector_visual_norm(v_detached)
         )
-        text_keys = self.selector_text_proj(self.selector_text_norm(text_tokens))
-        token_logits = torch.einsum(
-            "bqd,bld->bql", visual_query, text_keys
-        ) / math.sqrt(self.hidden_dim)
-        token_attention = self._masked_softmax(token_logits, text_mask)
+        if uniform_text_attention:
+            valid = text_mask.bool().to(text_tokens.dtype)
+            token_attention = valid / valid.sum(dim=-1, keepdim=True).clamp_min(1.0)
+            token_attention = token_attention.unsqueeze(1).expand(
+                -1, visual_context.shape[1], -1
+            )
+        else:
+            text_keys = self.selector_text_proj(self.selector_text_norm(text_tokens))
+            token_logits = torch.einsum(
+                "bqd,bld->bql", visual_query, text_keys
+            ) / math.sqrt(self.hidden_dim)
+            token_attention = self._masked_softmax(token_logits, text_mask)
 
-        # Values deliberately use the original projected text tokens.
+        # Values use the text representation supplied by the caller; Token-V2
+        # supplies the multimodal encoder text memory here.
         local_semantic = torch.einsum(
             "bql,bld->bqd", token_attention, text_tokens
         )
@@ -157,6 +172,8 @@ class TokenSelectiveLateSemanticCGP(nn.Module):
         query_states: Tensor,
         static_bypass: bool = False,
         token_static_bypass: bool = False,
+        selector_visual_context: Optional[Tensor] = None,
+        uniform_text_attention: bool = False,
     ) -> TokenLSDQCGPOutput:
         bsz, num_queries, dim = visual_context.shape
 
@@ -170,6 +187,8 @@ class TokenSelectiveLateSemanticCGP(nn.Module):
             raise ValueError("static_semantic must have shape [B,D]")
         if query_states.shape != visual_context.shape:
             raise ValueError("query_states must have shape [B,Q,D]")
+        if selector_visual_context is not None and selector_visual_context.shape != visual_context.shape:
+            raise ValueError("selector_visual_context must have the same shape as visual_context")
         if text_mask.shape != text_tokens.shape[:2]:
             raise ValueError("text_mask must have shape [B,L]")
         if bool((text_mask.sum(dim=1) == 0).any()):
@@ -178,7 +197,11 @@ class TokenSelectiveLateSemanticCGP(nn.Module):
         e_static = static_semantic.unsqueeze(1).expand(bsz, num_queries, dim)
 
         local_semantic, token_attention = self._select_local_semantic(
-            visual_context, text_tokens, text_mask
+            visual_context,
+            text_tokens,
+            text_mask,
+            selector_visual_context=selector_visual_context,
+            uniform_text_attention=uniform_text_attention,
         )
         if token_static_bypass:
             local_semantic = e_static

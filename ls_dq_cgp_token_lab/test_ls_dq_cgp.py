@@ -107,6 +107,21 @@ class TestTokenSelectiveCGP(unittest.TestCase):
             1e-5,
         )
 
+    def test_uniform_text_attention_is_uniform_over_selectable_tokens(self):
+        cgp = TokenSelectiveLateSemanticCGP(hidden_dim=8, num_basis=2, prompt_length=2)
+        mask = torch.tensor([[True, True, False, True]])
+        output = cgp(
+            visual_context=torch.randn(1, 3, 8),
+            static_semantic=torch.randn(1, 8),
+            text_tokens=torch.randn(1, 4, 8),
+            text_mask=mask,
+            query_states=torch.randn(1, 3, 8),
+            uniform_text_attention=True,
+        )
+        expected = mask.to(output.token_attention.dtype) / 3.0
+        expected = expected.unsqueeze(1).expand_as(output.token_attention)
+        torch.testing.assert_close(output.token_attention, expected)
+
     def test_rejects_empty_text_mask(self):
         cgp = TokenSelectiveLateSemanticCGP(hidden_dim=8)
         with self.assertRaisesRegex(ValueError, "at least one valid text token"):
@@ -187,6 +202,14 @@ class TestTokenLSDQCGPModel(unittest.TestCase):
                 src_vid_mask=src_vid_mask,
             )
             model.context_roll = False
+            model.selector_context_roll = True
+            selector_roll_outputs = model(
+                src_txt=src_txt,
+                src_txt_mask=src_txt_mask,
+                src_vid=src_vid,
+                src_vid_mask=src_vid_mask,
+            )
+            model.selector_context_roll = False
             model.token_static_bypass = True
             token_static_outputs = model(
                 src_txt=src_txt,
@@ -203,6 +226,13 @@ class TestTokenLSDQCGPModel(unittest.TestCase):
         )
         self.assertGreater(
             (active_outputs["pred_logits"] - token_static_outputs["pred_logits"])
+            .abs()
+            .max()
+            .item(),
+            1e-5,
+        )
+        self.assertGreater(
+            (active_outputs["pred_logits"] - selector_roll_outputs["pred_logits"])
             .abs()
             .max()
             .item(),

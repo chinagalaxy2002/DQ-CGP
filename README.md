@@ -109,6 +109,36 @@ QAP 的可审计训练与评估记录（不含 checkpoint 或预测 JSONL）已�
 > - [9组因子归因消融实验报告](results/component_attribution_seed2023/RESULTS.md)
 > - [DQ-CGP V3 Test Metrics](results/test/metrics.json)
 
+### 2.3 Token-V2：在同一 Multimodal Encoder Space 中选择文本
+
+Token-V2 保留 `Bind → Select → Adapt → Match` 主路径、原始全局语义锚点 $E_{static}$、Native Binding Loss 和全部训练超参数，只把 selector 使用的文本表示从 pre-encoder projection 改为 multimodal encoder memory：
+
+```text
+Token-V1: V_q^(encoder) → TextTokens^(pre-encoder)
+Token-V2: V_q^(encoder) → TextTokens^(encoder)
+```
+
+具体实现为 `txt_mem = memory[:, video_length:]`，并把 `txt_mem` 送入 token selector 和 local-semantic value aggregation；$E_{static}$ 仍由原始 `t_proj` 池化得到。Token-V2 还提供两个 inference-only counterfactual：
+
+- `uniform_text_attention`：在有效文本 token 上强制均匀 attention，只移除 occurrence-specific token selection。
+- `selector_context_roll`：只把滚动后的 $V_q$ 送给 selector，RCG/FRF 继续接收正确的 $V_q$。
+
+当前记录的是训练中保存的 Epoch 138 checkpoint（checkpoint 字段为零基 `137`）；checkpoint 文件后续单独上传。该 checkpoint 的验证集 `MR-full-mAP` 为 **20.97**，`R1@0.5` 为 **34.90**，`R1@0.7` 为 **17.65**。同一 checkpoint 的 Standard Test 结果如下：
+
+| Test 模式 | mAP | mR@1 | mR@3 | mR@5 | mIoU@1 | G-mIoU@1 | AUROC |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Active | 17.04 | 11.29 | 18.65 | 23.57 | 27.56 | 34.69 | 74.81 |
+| Uniform Text Attention | **17.12** | **11.41** | 18.73 | 23.72 | **27.87** | **34.75** | 74.81 |
+| Selector-only Context Roll | 17.08 | 11.26 | **18.91** | **23.82** | 27.44 | 34.58 | 74.81 |
+
+| Test 模式 | mR+@3 | mR+@5 | mIoU+@3 | mIoU+@5 |
+| :--- | ---: | ---: | ---: | ---: |
+| Active | 3.53 | 7.41 | 7.77 | 7.48 |
+| Uniform Text Attention | **3.59** | **7.60** | **7.95** | 7.66 |
+| Selector-only Context Roll | 3.56 | 7.47 | 7.92 | **7.76** |
+
+Active 没有优于 Uniform Text Attention，Selector-only Context Roll 也没有造成稳定退化。因此，这个 checkpoint 尚不支持“正确 occurrence context 通过 token selector 改善 language selection”的因果结论。Token-V2 修复了表示阶段不一致，但当前 selector 仍应视为探索性负结果。以上是训练过程中的固定快照，完整训练可能继续产生新的 validation-best checkpoint。
+
 ---
 
 ## 3. 环境配置
@@ -201,6 +231,38 @@ python ls_dq_cgp_tap_lab/evaluate_ls_dq_cgp.py \
   --gpu 0
 ```
 
+### 4.4 Token-V2 训练与两个 selector 反事实
+
+下面的脚本使用与 Token-V1 相同的 loss 和超参数，依次运行 Token-V2 训练、Active、Uniform Text Attention 和 Selector-only Context Roll：
+
+```bash
+PYTHON=/path/to/python \
+OUTPUT=outputs/token_ls_dq_cgp_v2_exist_seed2023 \
+bash ls_dq_cgp_token_lab/run_experiment_with_exist.sh 0
+```
+
+也可以使用同一 checkpoint 单独执行反事实评估：
+
+```bash
+# Active
+python ls_dq_cgp_token_lab/evaluate_ls_dq_cgp.py \
+  --checkpoint /path/to/ls_dq_cgp_token_v2_exist_best_epoch138.ckpt \
+  --output outputs/token_v2/test_active \
+  --split test --gpu 0
+
+# Uniform Text Attention
+python ls_dq_cgp_token_lab/evaluate_ls_dq_cgp.py \
+  --checkpoint /path/to/ls_dq_cgp_token_v2_exist_best_epoch138.ckpt \
+  --output outputs/token_v2/test_uniform_text_attention \
+  --split test --uniform_text_attention --gpu 0
+
+# Selector-only Context Roll
+python ls_dq_cgp_token_lab/evaluate_ls_dq_cgp.py \
+  --checkpoint /path/to/ls_dq_cgp_token_v2_exist_best_epoch138.ckpt \
+  --output outputs/token_v2/test_selector_context_roll \
+  --split test --selector_context_roll --gpu 0
+```
+
 ---
 
 ## 5. 代码结构
@@ -223,11 +285,11 @@ ls_dq_cgp_tap_lab/                       # QAP 探索性版本（含 UniformProm
 └── test_ls_dq_cgp.py                    # QAP 形状、初始化、梯度回归测试
 
 ls_dq_cgp_token_lab/                     # Token-Selective LS-DQ-CGP
-├── cgp_module.py                        # 文本 token selection、RCG, BPS, FRF 与匹配
-├── ls_dq_cgp_model.py                   # 模型组装、Native Binding Loss、token diagnostic
+├── cgp_module.py                        # Token-V2 selection、Uniform Text 与 selector-only roll
+├── ls_dq_cgp_model.py                   # Encoder text memory、Native Binding Loss、模型组装
 ├── train_ls_dq_cgp.py                   # Token-Selective 训练入口
-├── evaluate_ls_dq_cgp.py                # Active / Token Static / Context Roll 评估
-├── run_experiment_with_exist.sh         # Exist 版本训练及三种 Test 模式
+├── evaluate_ls_dq_cgp.py                # Active / Uniform Text / Selector-only Roll 评估
+├── run_experiment_with_exist.sh         # Token-V2 Exist 训练及三种 Test 模式
 └── test_ls_dq_cgp.py                    # Token selection 回归测试
 
 experiments/vmr_cgp/                     # 原版 DQ-CGP V3 代码

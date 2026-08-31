@@ -51,6 +51,16 @@ def main():
             "semantic while preserving RCG/BPS/FRF"
         ),
     )
+    counterfactual.add_argument(
+        "--uniform_text_attention",
+        action="store_true",
+        help="Replace occurrence-conditioned text attention with uniform valid-token attention",
+    )
+    counterfactual.add_argument(
+        "--selector_context_roll",
+        action="store_true",
+        help="Roll V_q only for the occurrence-specific text selector",
+    )
     parser.add_argument("--eval_bsz", type=int, default=4, help="Evaluation batch size")
     args = parser.parse_args()
 
@@ -95,6 +105,10 @@ def main():
         mode_name = "context_roll"
     elif args.token_static:
         mode_name = "token_static"
+    elif args.uniform_text_attention:
+        mode_name = "uniform_text_attention"
+    elif args.selector_context_roll:
+        mode_name = "selector_context_roll"
     else:
         mode_name = "active"
 
@@ -125,6 +139,8 @@ def main():
     model.static_bypass = args.static_bypass
     model.context_roll = args.context_roll
     model.token_static_bypass = args.token_static
+    model.uniform_text_attention = args.uniform_text_attention
+    model.selector_context_roll = args.selector_context_roll
 
     logger.info(f"Running inference on {args.split} (Mode: {mode_name})...")
     with torch.no_grad():
