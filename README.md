@@ -166,6 +166,20 @@ E_static + semantic_delta → E_adapt
 
 ---
 
+## 2.5 组件级消融实验（LS-DQ-CGP Ablation Lab）
+
+组件级消融代码集中在 [`ls_dq_cgp_ablation_lab/`](ls_dq_cgp_ablation_lab/)，不修改生产模型文件，提供统一 Seed 2023、优化器、existence head、saliency supervision 和 Native Binding 配置下的可复现实验：
+
+* `rcg_uniform`：RCG basis 权重固定为均匀路由；
+* `bps_query_mean` / `bps_zero`：分别消除 candidate-specific prompt 差异或将 prompt 置零；
+* `frf_remove`：移除学习式 FRF 融合，仅保留 routed prompt residual；
+* `native_binding_exist_aligned`：保留 D1 Native Binding 与 existence head，移除 late-semantic CGP 和 semantic matcher；
+* `delta-zero`：严格固定 $\Delta E_q=0$ 的独立实验见 `strict_delta_zero_lab/`。
+
+每个变体均提供训练、测试和 tmux 启动脚本；详细干预定义、推理级 sanity check 结果和运行命令见 [`ls_dq_cgp_ablation_lab/README.md`](ls_dq_cgp_ablation_lab/README.md)。训练输出、日志和 checkpoint 默认写入 `outputs/`、`logs/`，不纳入 Git。
+
+---
+
 ## 3. 环境配置
 
 ```bash
@@ -324,6 +338,7 @@ results/ls_dq_cgp_seed2023/              # LS-DQ-CGP 评测日志与指标记录
 results/ls_dq_cgp_exist_seed2023/        # Exist 版本完整日志、预测与评测报告
 results/token_ls_dq_cgp_exist_seed2023/  # Token-Selective 训练与测试日志、指标
 results/token_ls_dq_cgp_v2_exist_seed2023/ # Token-V2 当前训练与测试日志、指标
+ls_dq_cgp_ablation_lab/                  # RCG/BPS/FRF 与严格对齐 Native Binding+Exist 消融
 checkpoints/                             # 发布 Checkpoint 与 SHA256SUMS
 ```
 
