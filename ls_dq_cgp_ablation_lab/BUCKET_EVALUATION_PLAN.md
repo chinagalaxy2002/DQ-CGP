@@ -156,7 +156,7 @@ SportsMoments Test 全部为正例，全部负例均来自 WorldCup。模型可�
 2. Native Binding：控制 D1 binding supervision 后，衡量 late-semantic inference path 的增量；
 3. DQ-CGPv3：比较 late-semantic 与 intermediate residual 两种 CGP 注入位置的能力边界。
 
-Plain Moment-DETR-GMR 与早期 Native Binding 仅保留了归档的总体 Test 指标，不能据此推测其分桶表现。DQ-CGPv3 的发布 checkpoint 已在 `outputs/dq_cgp_v3_seed2023/test_recheck/` 重测并导出逐 Test-query prediction JSONL，因此可用于 Full 与 DQ-CGPv3（发布 checkpoint）的分桶比较；该结果不与 reproduced DQ-CGPv3 checkpoint 的总体表混用。
+Plain Moment-DETR-GMR baseline 已在 `outputs/moment_detr_gmr_baseline_seed2023/test_recheck/` 重测并导出逐 Test-query prediction JSONL，可用于分桶比较。早期 Native Binding 仍仅保留归档总体 Test 指标；其功能对齐的替代对照是已保存逐查询预测的 `native_binding_exist_aligned`。DQ-CGPv3 的发布 checkpoint 已在 `outputs/dq_cgp_v3_seed2023/test_recheck/` 重测并导出逐 Test-query prediction JSONL；该结果不与 reproduced DQ-CGPv3 checkpoint 的总体表混用。
 
 ## 5. 正式分桶定义
 
