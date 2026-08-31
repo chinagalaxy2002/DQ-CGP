@@ -139,6 +139,8 @@ Token-V2: V_q^(encoder) → TextTokens^(encoder)
 
 Active 没有优于 Uniform Text Attention，Selector-only Context Roll 也没有造成稳定退化。因此，这个 checkpoint 尚不支持“正确 occurrence context 通过 token selector 改善 language selection”的因果结论。Token-V2 修复了表示阶段不一致，但当前 selector 仍应视为探索性负结果。以上是训练过程中的固定快照，完整训练可能继续产生新的 validation-best checkpoint。
 
+当前训练和测试日志快照已归档至 [`results/token_ls_dq_cgp_v2_exist_seed2023/`](results/token_ls_dq_cgp_v2_exist_seed2023/)：包括 [`train.log`](results/token_ls_dq_cgp_v2_exist_seed2023/train.log)、[`val.log`](results/token_ls_dq_cgp_v2_exist_seed2023/val.log)、Epoch 138 验证指标，以及 Active、Uniform Text Attention 和 Selector-only Context Roll 的 `metrics.json`/`result.json`。日志上传时训练仍在继续；后续如出现新的 validation-best checkpoint，将再补充对应快照。
+
 ---
 
 ## 3. 环境配置
@@ -298,6 +300,7 @@ training/moment_detr_gmr/                # 数据集与基础训练模块
 results/ls_dq_cgp_seed2023/              # LS-DQ-CGP 评测日志与指标记录
 results/ls_dq_cgp_exist_seed2023/        # Exist 版本完整日志、预测与评测报告
 results/token_ls_dq_cgp_exist_seed2023/  # Token-Selective 训练与测试日志、指标
+results/token_ls_dq_cgp_v2_exist_seed2023/ # Token-V2 当前训练与测试日志、指标
 checkpoints/                             # 发布 Checkpoint 与 SHA256SUMS
 ```
 
