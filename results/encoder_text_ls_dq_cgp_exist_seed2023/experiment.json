@@ -1,0 +1,14 @@
+{
+  "variant": "encoder_text_ls_dq_cgp_exist",
+  "seed": 2023,
+  "model": "EncoderTextLateSemantic_MomentDETR",
+  "encoder_text_pool": "masked_mean",
+  "semantic_anchor": "pre_encoder_static_mean",
+  "use_exist_head": true,
+  "native_binding_coef": 0.2,
+  "num_basis": 16,
+  "prompt_length": 6,
+  "query_cgp_use_semantic_mask": true,
+  "epochs": 400,
+  "lr": 5e-05
+}

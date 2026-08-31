@@ -141,6 +141,29 @@ Active 没有优于 Uniform Text Attention，Selector-only Context Roll 也没�
 
 当前训练和测试日志快照已归档至 [`results/token_ls_dq_cgp_v2_exist_seed2023/`](results/token_ls_dq_cgp_v2_exist_seed2023/)：包括 [`train.log`](results/token_ls_dq_cgp_v2_exist_seed2023/train.log)、[`val.log`](results/token_ls_dq_cgp_v2_exist_seed2023/val.log)、Epoch 138 验证指标，以及 Active、Uniform Text Attention 和 Selector-only Context Roll 的 `metrics.json`/`result.json`。日志上传时训练仍在继续；后续如出现新的 validation-best checkpoint，将再补充对应快照。
 
+### 2.4 Encoder-Text LS-DQ-CGP
+
+Encoder-Text LS 是 Token-V2 的单一减法实验：移除 occurrence-conditioned token selector，直接对 multimodal encoder 的有效文本 memory 做 masked mean，得到 $E_{enc}$，并使用
+
+```text
+V_q + E_enc → RCG → BPS (原 MeanPool) → FRF
+E_static + semantic_delta → E_adapt
+```
+
+其中 $E_{static}$ 继续作为 pre-encoder global semantic anchor。训练保持 Seed 2023、`lr=5e-5`、`native_bind_coef=0.2`、16 个 basis、prompt length 6 和 existence head 开启；代码位于 `ls_dq_cgp_encoder_text_lab/`。
+
+最终训练在 Epoch 150 early stop，最佳验证 checkpoint 为 Epoch 100，Val MR-full-mAP 为 **19.53**。同一 checkpoint 的 Standard Test 结果如下：
+
+| Test 模式 | mAP | mR@1 | mR@3 | mR@5 | mIoU@1 | mIoU@3 | mIoU@5 |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Active | 16.38 | 9.54 | 18.84 | 24.17 | 26.07 | 23.56 | 23.46 |
+| PreEncoderCondition | **16.49** | 9.59 | **19.48** | 23.90 | **26.10** | **23.87** | **23.70** |
+| ContextRoll | 14.55 | 8.10 | 15.33 | 21.66 | 21.59 | 19.57 | 19.48 |
+
+`PreEncoderCondition` 略高于 Active，因此本实验没有证明 $E_{enc}$ 相比 $E_{static}$ 在 Test 上具有额外的正因果贡献；但 ContextRoll 从 16.38 降至 14.55，继续支持正确 occurrence-specific $V_q$ 对后续语义适配的重要性。
+
+训练与评测日志及指标文件已归档至 [`results/encoder_text_ls_dq_cgp_exist_seed2023/`](results/encoder_text_ls_dq_cgp_exist_seed2023/)，包括 [`train.log`](results/encoder_text_ls_dq_cgp_exist_seed2023/train.log)、[`val.log`](results/encoder_text_ls_dq_cgp_exist_seed2023/val.log)、Active、PreEncoderCondition 和 ContextRoll 的指标与运行元数据。checkpoint 和预测 JSONL 不上传。
+
 ---
 
 ## 3. 环境配置
