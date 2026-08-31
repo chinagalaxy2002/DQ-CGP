@@ -1,0 +1,40 @@
+{
+  "variant": "ls_dq_cgp_exist",
+  "has_exist_head": true,
+  "mode": "strict_delta_zero",
+  "intervention": "e_adapt = frf_norm(e_static_expanded)",
+  "preserved": [
+    "frf_norm",
+    "semantic_proj",
+    "visual_proj",
+    "cosine_matcher",
+    "logit_scale",
+    "logit_bias"
+  ],
+  "split": "test",
+  "checkpoint": "<repo>/outputs/ls_dq_cgp_exist_seed2023/best.ckpt",
+  "checkpoint_epoch": 124,
+  "brief": {
+    "AUROC": 75.83,
+    "Rej-F1@0.4": 53.05,
+    "Acc@0.4": 63.61,
+    "Rej-F1@0.6": 72.2,
+    "Acc@0.6": 69.31,
+    "G-mIoU@1": 25.32,
+    "G-mIoU@3": 23.19,
+    "G-mIoU@5": 22.2,
+    "mAP": 11.61,
+    "mR@1": 4.68,
+    "mR@3": 12.47,
+    "mR@5": 18.19,
+    "mR+@1": 0.0,
+    "mR+@3": 3.09,
+    "mR+@5": 5.94,
+    "mIoU@1": 13.62,
+    "mIoU@3": 12.02,
+    "mIoU@5": 11.93,
+    "mIoU+@1": 0.0,
+    "mIoU+@3": 3.69,
+    "mIoU+@5": 3.73
+  }
+}
