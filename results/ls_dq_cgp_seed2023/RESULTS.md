@@ -38,7 +38,7 @@ D2 final query ─────────→ pred_logits (Relevance Score)
 
 ## 2. 官方 Standard Test 评测对比 (Seed 2023)
 
-| 评估指标 (Metric) | Baseline | Native Binding (零额外参数) | 原版 Full DQ-CGP (中间残差) | **LS-DQ-CGP (Active 模式)** | **同模型 Static Bypass (消融反事实)** |
+| 评估指标 (Metric) | Matched retrained Baseline | Native Binding (零额外参数) | Full DQ-CGP reproduced (中间残差) | **LS-DQ-CGP (Active 模式)** | **同模型 Static Bypass (消融反事实)** |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Test mAP** | 6.14 | 14.46 | 17.72 (带 exist head) | **16.65** | 11.68 |
 | **mR@1** | - | 9.90 | - | **10.84** | 4.95 |
@@ -50,7 +50,7 @@ D2 final query ─────────→ pred_logits (Relevance Score)
 | **mIoU@5** | 11.61 | 24.19 | 26.29 | **24.07** | 11.26 |
 | **mIoU+@3 (多时刻)**| - | 6.80 | - | **7.35** | 2.29 |
 | **mIoU+@5 (多时刻)**| - | 6.21 | - | **7.12** | 2.39 |
-| **AUROC** | - | 76.69 | 77.33 | **75.04** | 36.64 |
+| **AUROC** | 71.87 | 76.69 | 76.23 | **75.04** | 36.64 |
 | **Best Val mAP** | 7.09 (ep11) | 19.55 (ep81) | 20.80 (ep112) | **19.10** (ep139) | 10.93 (ep139) |
 
 ---
@@ -59,10 +59,16 @@ D2 final query ─────────→ pred_logits (Relevance Score)
 
 1. **全面超越 Native Binding 仅 Loss 模式**：
    * 在相同的 Binding Loss 约束下，LS-DQ-CGP 在测试集上获得 **+2.19 mAP** 净增益（14.46 $\rightarrow$ 16.65）。
-   * 在多时刻检索指标 `mR+@5` 上直接从 **4.43%** 跃升至 **8.44%**（提升近 1 倍），证明动态文本表征对于区分同视频中不同动作时刻的关键作用。
-2. **严格的反事实证据 (Active vs Static Bypass)**：
+   * 在多时刻检索指标 `mR+@5` 上从 **4.43%** 提升至 **8.44%**。这一单 seed 对比支持继续研究动态文本表征，但不能单独建立模块级因果结论。
+2. **同 checkpoint 反事实证据 (Active vs Static Bypass)**：
    * 在同一个训练好的 Checkpoint 上，仅仅将 $E_{adapt}^q$ 替换为全局静态文本 $E_{static}$，测试集 mAP 瞬间由 **16.65** 暴跌至 **11.68**，Top-1 检索能力腰斩。
-   * 这直接证明了性能的大幅跃升不是偶然，而是来自于 candidate-specific 动态提示词与语义适配的真实贡献。
+   * 该结果说明同一已训练模型的排序明显依赖 candidate-specific adapted semantics；它不排除训练过程、模块协同或 checkpoint 选择的影响。
+
+### Checkpoint 与 existence-score 口径
+
+DQ-CGP reproduced 列的 mAP 17.72 与 AUROC 76.23 来自同一个 Epoch 112 checkpoint；已发布 Epoch 86 checkpoint 的另一套结果为 mAP 15.51、AUROC 77.33，二者不混用。
+
+LS-DQ-CGP Epoch 139 是历史 `mr_only=True` 实验：checkpoint 的 state dict 虽保留未训练的 `exist_head` 参数，但归档 Active/Static 指标使用 window score，而非独立 existence score。当前 evaluator 已改为优先读取 checkpoint 的 `mr_only` 训练协议，避免仅按参数名误判。旧的未提交 context-roll 重评估曾受此问题影响，不纳入本报告。
 
 ---
 

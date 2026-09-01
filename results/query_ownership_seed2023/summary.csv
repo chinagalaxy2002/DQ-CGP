@@ -1,0 +1,4 @@
+method,num_samples,num_positive_samples,num_empty_gt_samples,num_gt,owner_retention,handoff_rate,direct_switch_rate,drop_rate,sample_macro_retention
+baseline,465,255,210,365,0.739726,0.260274,0.079452,0.180822,0.782353
+dq_active_beta_0.05,465,255,210,365,0.890411,0.109589,0.035616,0.073973,0.908170
+dq_beta_zero,465,255,210,365,0.890411,0.109589,0.035616,0.073973,0.910131

@@ -33,6 +33,29 @@ def load_jsonl(path):
         return [json.loads(line) for line in f if line.strip()]
 
 
+def checkpoint_uses_exist_head(ckpt, state_dict):
+    """Restore the checkpoint's evaluation protocol, not just its parameter shape.
+
+    The historical MR-only LS checkpoint contains a dormant ``exist_head``
+    namespace inherited from the base model, although that head was neither
+    trained nor emitted during the archived run.  Parameter-name detection
+    alone therefore changes its GMR classification protocol at re-evaluation.
+    """
+
+    has_parameters = any("exist_head" in key for key in state_dict)
+    saved_opt = ckpt.get("opt") if isinstance(ckpt, dict) else None
+    if isinstance(saved_opt, dict):
+        mr_only = saved_opt.get("mr_only")
+        enabled = saved_opt.get("use_exist_head")
+    else:
+        mr_only = getattr(saved_opt, "mr_only", None)
+        enabled = getattr(saved_opt, "use_exist_head", None)
+
+    if mr_only is True or enabled is False:
+        return False
+    return has_parameters
+
+
 def main():
     parser = argparse.ArgumentParser(description="Evaluate LS-DQ-CGP")
     parser.add_argument("--checkpoint", required=True, help="Path to checkpoint .ckpt")
@@ -50,13 +73,14 @@ def main():
     output = Path(args.output).resolve()
     output.mkdir(parents=True, exist_ok=True)
 
-    # Load checkpoint state first to detect exist_head
+    # Load checkpoint state first and restore its original evaluation protocol.
     ckpt_path = Path(args.checkpoint).resolve()
     logger.info(f"Loading checkpoint from {ckpt_path}...")
     ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
     state_dict = ckpt["model"] if "model" in ckpt else ckpt
 
-    has_exist_head = any("exist_head" in key for key in state_dict)
+    has_exist_head_parameters = any("exist_head" in key for key in state_dict)
+    has_exist_head = checkpoint_uses_exist_head(ckpt, state_dict)
 
     manager = BaseOptions("moment_detr", "soccer_gmr", "clip_slowfast")
     manager.parse()
@@ -134,6 +158,7 @@ def main():
     result_record = {
         "variant": "ls_dq_cgp_exist" if has_exist_head else "ls_dq_cgp",
         "has_exist_head": has_exist_head,
+        "checkpoint_has_exist_head_parameters": has_exist_head_parameters,
         "mode": mode_name,
         "split": args.split,
         "checkpoint": str(ckpt_path),

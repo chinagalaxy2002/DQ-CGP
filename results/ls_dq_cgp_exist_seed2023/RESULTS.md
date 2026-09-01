@@ -17,7 +17,7 @@ This directory records the completed `ls_dq_cgp_exist` run on the Soccer-GMR Sta
 | Best checkpoint | epoch 124 (checkpoint field is zero-based `123`) |
 | Best validation mAP | 19.99 |
 
-Training stopped after epoch 175 because validation mAP had not exceeded the epoch-124 best for 50 evaluations.
+Training stopped after epoch 174 because validation mAP had not exceeded the epoch-124 best for 50 evaluations.
 
 ## Standard Test Results
 

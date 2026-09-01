@@ -14,10 +14,27 @@ for path in (ROOT, TRAIN_ROOT):
 from models.moment_detr_gmr.moment_detr import build_model
 from config import BaseOptions
 from ls_dq_cgp_lab.cgp_module import LateSemanticCGP
+from ls_dq_cgp_lab.evaluate_ls_dq_cgp import checkpoint_uses_exist_head
 from ls_dq_cgp_lab.ls_dq_cgp_model import LSDQCGPModel, install_ls_dq_cgp_loss
 
 
 class TestLSDQCGP(unittest.TestCase):
+
+    def test_checkpoint_protocol_overrides_dormant_exist_head_parameters(self):
+        state_dict = {"base_model.exist_head.weight": torch.zeros(1)}
+        self.assertFalse(
+            checkpoint_uses_exist_head(
+                {"opt": {"mr_only": True, "use_exist_head": True}},
+                state_dict,
+            )
+        )
+        self.assertTrue(
+            checkpoint_uses_exist_head(
+                {"opt": {"mr_only": False, "use_exist_head": True}},
+                state_dict,
+            )
+        )
+        self.assertTrue(checkpoint_uses_exist_head({}, state_dict))
 
     def test_cgp_module_shapes_and_bypass(self):
         cgp = LateSemanticCGP(hidden_dim=256, num_basis=16, prompt_length=6)

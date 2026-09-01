@@ -70,7 +70,7 @@ The default output directory is `outputs/ls_dq_cgp_delta_zero_train_seed2023/`. 
 ## From-scratch training result (Seed 2023)
 
 The run completed with early stopping at epoch 122. The best validation score was
-`MR-full-mAP = 18.62` (best checkpoint selected by validation mAP).
+`MR-full-mAP = 18.62` at epoch 72 (best checkpoint selected by validation mAP).
 
 The resulting Standard Test metrics were:
 
